@@ -1,0 +1,12 @@
+{
+	"name": "webedit/orm",
+	"require": {
+		"nextras/orm": "dev-master",
+		"webedit/config": "dev-master"
+	},
+	"autoload": {
+		"psr-4": {
+			"WebEdit\\": "src/"
+		}
+	}
+}
