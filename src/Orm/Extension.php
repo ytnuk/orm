@@ -17,7 +17,7 @@ final class Extension extends Orm\DI\OrmExtension implements Config\Provider
 	 * @var array
 	 */
 	private $defaults = [
-		'model' => Database::class,
+		'model' => Model::class,
 		'repositories' => []
 	];
 
