@@ -4,8 +4,8 @@ namespace WebEdit\Orm\Grid;
 
 use Nette\Forms;
 use WebEdit\Application;
-use WebEdit\Orm;
 use WebEdit\Grid;
+use WebEdit\Orm;
 
 /**
  * Class Control
