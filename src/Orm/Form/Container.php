@@ -56,7 +56,7 @@ abstract class Container extends Form\Container
 	public function removeEntity()
 	{
 		foreach ($this->metadata->getProperties() as $property) {
-			if ($property->container === Orm\Relationships\OneHasOneDirected::class && $property->relationshipIsMain) {
+			if ($property->container === Nextras\Orm\Relationships\OneHasOneDirected::class && $property->relationshipIsMain) {
 				$this->getComponent($property->name)
 					->removeEntity();
 			}
@@ -136,7 +136,7 @@ abstract class Container extends Form\Container
 		}
 		if ($this->entity->hasValue($property->name)) {
 			$value = $this->entity->getValue($property->name);
-			$input->setDefaultValue($value instanceof Database\Entity ? $value->getId() : $value);
+			$input->setDefaultValue($value instanceof Orm\Entity ? $value->getId() : $value);
 		}
 		$input->setAttribute('placeholder', $this->formatPropertyPlaceholder($property));
 	}
