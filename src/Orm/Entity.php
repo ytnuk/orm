@@ -5,11 +5,11 @@ namespace WebEdit\Orm;
 use Nextras\Orm;
 
 /**
- * Class Database
+ * Class Entity
  *
  * @package WebEdit\Orm
  */
-final class Model extends Orm\Model\DIModel
+abstract class Entity extends Orm\Entity\Entity
 {
 
 }

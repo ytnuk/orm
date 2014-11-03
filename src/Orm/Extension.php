@@ -2,8 +2,10 @@
 namespace WebEdit\Orm;
 
 use Nextras\Orm;
+use WebEdit;
 use WebEdit\Config;
 use WebEdit\Database;
+use WebEdit\Form;
 
 /**
  * Class Extension
@@ -26,7 +28,26 @@ final class Extension extends Orm\DI\OrmExtension implements Config\Provider
 	 */
 	public function getConfigResources()
 	{
-		return [self::class => $this->defaults];
+		return [
+			self::class => $this->defaults,
+			Form\Extension::class => [
+				'forms' => [
+					$this->prefix('form')
+				]
+			],
+			'services' => [
+				$this->prefix('form') => [
+					'implement' => WebEdit\Orm\Form\Factory::class,
+					'parameters' => ['entity'],
+					'arguments' => ['%entity%']
+				],
+				$this->prefix('gridControl') => [
+					'implement' => Grid\Control\Factory::class,
+					'parameters' => ['repository'],
+					'arguments' => ['%repository%']
+				]
+			]
+		];
 	}
 
 	/**
