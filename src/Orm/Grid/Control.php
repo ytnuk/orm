@@ -5,6 +5,7 @@ namespace WebEdit\Orm\Grid;
 use Nette\Forms;
 use WebEdit\Application;
 use WebEdit\Orm;
+use WebEdit\Grid;
 
 /**
  * Class Control
@@ -39,7 +40,7 @@ final class Control extends Application\Control
 	 */
 	protected function createComponentGrid()
 	{
-		$grid = new Control(function (Database\Entity $entity = NULL) {
+		$grid = new Grid\Control(function (Orm\Entity $entity = NULL) {
 			if ( ! $entity) {
 				$entityClass = $this->repository->getEntityClassName([]);
 				$entity = new $entityClass;

@@ -2,7 +2,9 @@
 	"name": "webedit/orm",
 	"require": {
 		"nextras/orm": "dev-master",
-		"webedit/config": "dev-master"
+		"webedit/config": "dev-master",
+		"webedit/grid": "dev-master",
+		"webedit/form": "dev-master"
 	},
 	"autoload": {
 		"psr-4": {
