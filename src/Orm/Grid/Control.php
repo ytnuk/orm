@@ -58,7 +58,7 @@ final class Control extends Application\Control
 		});
 
 		return $grid->setLink(function ($entity) {
-			return $entity ? $this->presenter->link('Presenter:edit', ['id' => $entity->id]) : $this->presenter->link('Presenter:add');
+			return $entity ? $this->presenter->link('Presenter:view', ['id' => $entity->id]) : $this->presenter->link('Presenter:add');
 		})
 			->filterInputs(['this']);
 	}
