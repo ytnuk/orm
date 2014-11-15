@@ -74,12 +74,12 @@ final class Form extends WebEdit\Form
 		switch ($form->submitted->name) {
 			case 'delete':
 				$this->getPresenter()
-					->redirect('Presenter:view');
+					->redirect('Presenter:list');
 				break;
 			case 'edit':
 			case 'add':
 				$this->getPresenter()
-					->redirect('Presenter:edit', $this->entity->id);
+					->redirect('Presenter:view', $this->entity->id);
 				break;
 		}
 	}
