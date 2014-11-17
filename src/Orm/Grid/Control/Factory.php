@@ -2,7 +2,7 @@
 
 namespace WebEdit\Orm\Grid\Control;
 
-use WebEdit\Orm;
+use WebEdit;
 
 /**
  * Interface Factory
@@ -13,9 +13,9 @@ interface Factory
 {
 
 	/**
-	 * @param Orm\Repository $repository
+	 * @param WebEdit\Orm\Repository $repository
 	 *
-	 * @return Orm\Grid\Control
+	 * @return WebEdit\Orm\Grid\Control
 	 */
 	public function create($repository);
 }

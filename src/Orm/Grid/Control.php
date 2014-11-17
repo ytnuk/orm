@@ -2,34 +2,31 @@
 
 namespace WebEdit\Orm\Grid;
 
-use Nette\Forms;
-use WebEdit\Application;
-use WebEdit\Grid;
-use WebEdit\Orm;
+use WebEdit;
 
 /**
  * Class Control
  *
  * @package WebEdit\Orm
  */
-final class Control extends Application\Control
+final class Control extends WebEdit\Application\Control
 {
 
 	/**
-	 * @var Orm\Repository
+	 * @var WebEdit\Orm\Repository
 	 */
 	private $repository;
 
 	/**
-	 * @var Orm\Form\Factory
+	 * @var WebEdit\Orm\Form\Factory
 	 */
 	private $form;
 
 	/**
-	 * @param Orm\Repository $repository
-	 * @param Orm\Form\Factory $form
+	 * @param WebEdit\Orm\Repository $repository
+	 * @param WebEdit\Orm\Form\Factory $form
 	 */
-	public function __construct(Orm\Repository $repository, Orm\Form\Factory $form)
+	public function __construct(WebEdit\Orm\Repository $repository, WebEdit\Orm\Form\Factory $form)
 	{
 		$this->repository = $repository;
 		$this->form = $form;
@@ -40,7 +37,7 @@ final class Control extends Application\Control
 	 */
 	protected function createComponentGrid()
 	{
-		$grid = new Grid\Control(function (Orm\Entity $entity = NULL) {
+		$grid = new WebEdit\Grid\Control(function (WebEdit\Orm\Entity $entity = NULL) {
 			if ( ! $entity) {
 				$entityClass = $this->repository->getEntityClassName([]);
 				$entity = new $entityClass;

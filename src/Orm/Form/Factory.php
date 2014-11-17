@@ -2,7 +2,7 @@
 
 namespace WebEdit\Orm\Form;
 
-use WebEdit\Orm;
+use WebEdit;
 
 /**
  * Interface Factory
@@ -13,9 +13,9 @@ interface Factory
 {
 
 	/**
-	 * @param Orm\Entity $entity
+	 * @param WebEdit\Orm\Entity $entity
 	 *
-	 * @return Orm\Form
+	 * @return WebEdit\Orm\Form
 	 */
 	public function create($entity);
 }

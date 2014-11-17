@@ -2,7 +2,7 @@
 
 namespace WebEdit\Orm;
 
-use Nextras\Orm;
+use Nextras;
 use WebEdit;
 
 /**
@@ -29,7 +29,7 @@ final class Form extends WebEdit\Form
 	private $repository;
 
 	/**
-	 * @var Orm\Mapper\IMapper
+	 * @var Nextras\Orm\Mapper\IMapper
 	 */
 	private $mapper;
 

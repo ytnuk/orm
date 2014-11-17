@@ -2,14 +2,14 @@
 
 namespace WebEdit\Orm;
 
-use Nextras\Orm;
+use Nextras;
 
 /**
  * Class Repository
  *
  * @package WebEdit\Orm
  */
-abstract class Repository extends Orm\Repository\Repository
+abstract class Repository extends Nextras\Orm\Repository\Repository
 {
 
 	/**

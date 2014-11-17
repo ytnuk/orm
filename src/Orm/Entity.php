@@ -2,14 +2,14 @@
 
 namespace WebEdit\Orm;
 
-use Nextras\Orm;
+use Nextras;
 
 /**
  * Class Entity
  *
  * @package WebEdit\Orm
  */
-abstract class Entity extends Orm\Entity\Entity
+abstract class Entity extends Nextras\Orm\Entity\Entity
 {
 
 }

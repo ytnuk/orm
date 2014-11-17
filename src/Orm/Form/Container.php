@@ -3,19 +3,18 @@
 namespace WebEdit\Orm\Form;
 
 use Nextras;
-use WebEdit\Form;
-use WebEdit\Orm;
+use WebEdit;
 
 /**
  * Class Container
  *
  * @package WebEdit\Database
  */
-abstract class Container extends Form\Container
+abstract class Container extends WebEdit\Form\Container
 {
 
 	/**
-	 * @var Orm\Entity
+	 * @var WebEdit\Orm\Entity
 	 */
 	protected $entity;
 
@@ -25,32 +24,32 @@ abstract class Container extends Form\Container
 	protected $metadata;
 
 	/**
-	 * @var Orm\Repository
+	 * @var WebEdit\Orm\Repository
 	 */
 	protected $repository;
 
 	/**
-	 * @var Orm\Mapper
+	 * @var WebEdit\Orm\Mapper
 	 */
 	protected $mapper;
 
 	/**
-	 * @var Orm\Model
+	 * @var WebEdit\Orm\Model
 	 */
 	protected $model;
 
 	/**
-	 * @param Orm\Entity $entity
-	 * @param Orm\Repository $repository
+	 * @param WebEdit\Orm\Entity $entity
+	 * @param WebEdit\Orm\Repository $repository
 	 */
-	public function __construct(Orm\Entity $entity, Orm\Repository $repository)
+	public function __construct(WebEdit\Orm\Entity $entity, WebEdit\Orm\Repository $repository)
 	{
 		$this->entity = $entity;
 		$this->metadata = $entity->getMetadata();
 		$this->repository = $repository;
 		$this->mapper = $this->repository->getMapper();
 		$this->model = $this->repository->getModel();
-		$this->monitor(Form::class);
+		$this->monitor(WebEdit\Form::class);
 	}
 
 	public function removeEntity()
@@ -67,7 +66,7 @@ abstract class Container extends Form\Container
 	/**
 	 * @param array $values
 	 *
-	 * @return Orm\Entity
+	 * @return WebEdit\Orm\Entity
 	 */
 	public function setEntityValues(array $values)
 	{
@@ -83,7 +82,7 @@ abstract class Container extends Form\Container
 	}
 
 	/**
-	 * @param Form $form
+	 * @param WebEdit\Form $form
 	 */
 	protected function attached($form)
 	{
@@ -136,7 +135,7 @@ abstract class Container extends Form\Container
 		}
 		if ($this->entity->hasValue($property->name)) {
 			$value = $this->entity->getValue($property->name);
-			$input->setDefaultValue($value instanceof Orm\Entity ? $value->getId() : $value);
+			$input->setDefaultValue($value instanceof WebEdit\Orm\Entity ? $value->getId() : $value);
 		}
 		$input->setAttribute('placeholder', $this->formatPropertyPlaceholder($property));
 	}
@@ -205,12 +204,12 @@ abstract class Container extends Form\Container
 	}
 
 	/**
-	 * @param Orm\Entity $entity
+	 * @param WebEdit\Orm\Entity $entity
 	 * @param string $name
 	 *
 	 * @return self
 	 */
-	public function addEntityContainer(Orm\Entity $entity, $name)
+	public function addEntityContainer(WebEdit\Orm\Entity $entity, $name)
 	{
 		$class = rtrim($entity->getMetadata()
 				->getClassName(), 'a..zA..Z') . 'Form\Container';

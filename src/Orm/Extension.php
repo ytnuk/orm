@@ -1,18 +1,15 @@
 <?php
 namespace WebEdit\Orm;
 
-use Nextras\Orm;
+use Nextras;
 use WebEdit;
-use WebEdit\Config;
-use WebEdit\Database;
-use WebEdit\Form;
 
 /**
  * Class Extension
  *
  * @package WebEdit\Orm
  */
-final class Extension extends Orm\DI\OrmExtension implements Config\Provider
+final class Extension extends Nextras\Orm\DI\OrmExtension implements WebEdit\Config\Provider
 {
 
 	/**
@@ -30,14 +27,14 @@ final class Extension extends Orm\DI\OrmExtension implements Config\Provider
 	{
 		return [
 			self::class => $this->defaults,
-			Form\Extension::class => [
+			WebEdit\Form\Extension::class => [
 				'forms' => [
 					$this->prefix('form')
 				]
 			],
 			'services' => [
 				$this->prefix('form') => [
-					'implement' => WebEdit\Orm\Form\Factory::class,
+					'implement' => Form\Factory::class,
 					'parameters' => ['entity'],
 					'arguments' => ['%entity%']
 				],

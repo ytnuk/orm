@@ -2,14 +2,14 @@
 
 namespace WebEdit\Orm;
 
-use Nextras\Orm;
+use Nextras;
 
 /**
  * Class Mapper
  *
  * @package WebEdit\Orm
  */
-abstract class Mapper extends Orm\Mapper\Mapper
+abstract class Mapper extends Nextras\Orm\Mapper\Mapper
 {
 
 	/**
