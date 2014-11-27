@@ -113,7 +113,7 @@ final class Form extends WebEdit\Form
 	}
 
 	/**
-	 * @return \Nette\Forms\Container
+	 * @return Nette\Forms\Container
 	 */
 	public function addActionContainer()
 	{
