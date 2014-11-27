@@ -226,10 +226,18 @@ abstract class Container extends WebEdit\Form\Container
 	 */
 	protected function addPropertyManyHasOne(Nextras\Orm\Entity\Reflection\PropertyMetadata $property)
 	{
+		$repository = $this->model->getRepository($property->relationshipRepository);
+		$class = $repository->getEntityClassName([]);
+		$entity = new $class;
+		$primaryKeys = $entity->getMetadata()
+			->getPrimaryKey();
+		$primaryKey = reset($primaryKeys);
+		$items = $this->repository->findBy([$primaryKey . '!=' => $this->entity->getId()])
+			->fetchPairs($primaryKey, $entity::PROPERTY_NAME);
+
 		return $this->addSelect($property->name, $this->formatPropertyLabel($property), [])
 			->setPrompt($this->formatPropertyPrompt($property))
-			->setItems($this->repository->findBy(['id!=' => $this->entity->getId()])
-				->fetchPairs('id', 'title'));
+			->setItems($items);
 	}
 
 	/**

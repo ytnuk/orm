@@ -1,0 +1,21 @@
+form:
+	action:
+		group: Akce
+		add:
+			label: Přidat
+			success:
+				message: Přidání proběhlo v pořádku.
+			error:
+				message: Při přidání nastala chyba.
+		edit:
+			label: Upravit
+			success:
+				message: Úprava proběhla v pořádku.
+			error:
+				message: Při úpravě nastala chyba.
+		delete:
+			label: Smazat
+			success:
+				message: Smazání proběhlo v pořádku.
+			error:
+				message: Při smazání nastala chyba.

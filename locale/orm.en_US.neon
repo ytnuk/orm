@@ -1,0 +1,26 @@
+form:
+	action:
+		group: Actions
+		add:
+			label: Add
+			success:
+				message: Adding was successfull.
+			error:
+				message: Adding was unsuccessfull.
+		edit:
+			label: Edit
+			success:
+				message: Editing was successfull.
+			error:
+				message: Editing was unsuccessfull.
+		delete:
+			label: Delete
+			success:
+				message: Deleting was successfull.
+			error:
+				message: Deleting was unsuccessfull.
+		success:
+			message: Action was successfull.
+		error:
+			message: Action was unsuccessfull.
+

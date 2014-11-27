@@ -43,7 +43,7 @@ final class Control extends WebEdit\Application\Control
 				$entity = new $entityClass;
 			}
 			$form = $this->form->create($entity);
-			$form->onSuccess[] = function () {
+			$form->onSubmit[] = function () {
 				$this->redirect('this');
 			};
 

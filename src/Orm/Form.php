@@ -2,6 +2,7 @@
 
 namespace WebEdit\Orm;
 
+use Nette;
 use Nextras;
 use WebEdit;
 
@@ -49,13 +50,10 @@ final class Form extends WebEdit\Form
 		];
 	}
 
-	/**
-	 * @param self $form
-	 */
-	public function success(self $form)
+	public function success()
 	{
-		if ($form->submitted === TRUE || $form->submitted->name != 'delete') {
-			$values = $form->getValues(TRUE);
+		if ($this->submitted === TRUE || $this->submitted->name != 'delete') {
+			$values = $this->getValues(TRUE);
 			$this->getComponent('this')
 				->setEntityValues($values['this']);
 			$this->repository->persist($this->entity);
@@ -66,22 +64,25 @@ final class Form extends WebEdit\Form
 		$this->repository->flush($this->entity);
 	}
 
-	/**
-	 * @param self $form
-	 */
-	public function redirect(self $form)
+	public function formatMessage()
 	{
-		switch ($form->submitted->name) {
-			case 'delete':
-				$this->getPresenter()
-					->redirect('Presenter:list');
-				break;
-			case 'edit':
-			case 'add':
-				$this->getPresenter()
-					->redirect('Presenter:view', $this->entity->id);
-				break;
+		$message = parent::formatMessage();
+
+		return $this->submittedBy() ? 'orm.' . $message : $message;
+	}
+
+	public function redirect()
+	{
+		$presenter = $this->getPresenter();
+		if ($this->submittedBy('delete') && $this->isValid()) {
+			$presenter->redirect('Presenter:list');
 		}
+		$presenter->redirect('Presenter:view', $this->entity->id);
+	}
+
+	protected function getParentControl()
+	{
+		return $this->submittedBy('delete') && $this->isValid() ? $this->getPresenter() : parent::getParentControl();
 	}
 
 	/**
@@ -92,7 +93,7 @@ final class Form extends WebEdit\Form
 		parent::attached($control);
 		$this->addEntityContainer();
 		$this->addActionContainer();
-		$this->onSuccess[] = [
+		$this->onSubmit[] = [
 			$this,
 			'redirect'
 		];
@@ -116,14 +117,14 @@ final class Form extends WebEdit\Form
 	 */
 	public function addActionContainer()
 	{
-		$this->addGroup('form.action.group');
+		$this->addGroup('orm.form.action.group');
 		$action = $this->addContainer('action');
 		if ($this->entity->getId()) {
-			$action->addSubmit('edit', 'form.action.edit.label');
-			$action->addSubmit('delete', 'form.action.delete.label')
+			$action->addSubmit('edit', 'orm.form.action.edit.label');
+			$action->addSubmit('delete', 'orm.form.action.delete.label')
 				->setValidationScope(FALSE);
 		} else {
-			$action->addSubmit('add', 'form.action.add.label');
+			$action->addSubmit('add', 'orm.form.action.add.label');
 		}
 
 		return $action;

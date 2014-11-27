@@ -17,6 +17,8 @@ abstract class Repository extends Nextras\Orm\Repository\Repository
 	 */
 	public static function getEntityClassNames()
 	{
-		return [rtrim(get_called_class(), 'a..zA..Z') . 'Entity'];
+		return array_map(function ($name) {
+			return $name . 'Entity';
+		}, parent::getEntityClassNames());
 	}
 }

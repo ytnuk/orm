@@ -18,8 +18,9 @@ abstract class Mapper extends Nextras\Orm\Mapper\Mapper
 	public function getTableName()
 	{
 		if ( ! $this->tableName) {
-			$namespace = strtolower(str_replace('\\', '_', $this->reflection->getNamespaceName()));
-			$this->tableName = substr($namespace, strpos($namespace, '_') + 1);
+			$namespace = explode('\\', $this->reflection->getNamespaceName());
+			array_shift($namespace);
+			$this->tableName = implode('_', array_map('lcfirst', $namespace));
 		}
 
 		return $this->tableName;

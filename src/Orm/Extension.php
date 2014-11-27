@@ -1,6 +1,7 @@
 <?php
 namespace WebEdit\Orm;
 
+use Kdyby;
 use Nextras;
 use WebEdit;
 
@@ -42,6 +43,11 @@ final class Extension extends Nextras\Orm\DI\OrmExtension implements WebEdit\Con
 					'implement' => Grid\Control\Factory::class,
 					'parameters' => ['repository'],
 					'arguments' => ['%repository%']
+				]
+			],
+			Kdyby\Translation\DI\TranslationExtension::class => [
+				'dirs' => [
+					__DIR__ . '/../../locale'
 				]
 			]
 		];
