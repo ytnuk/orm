@@ -1,32 +1,32 @@
 <?php
 
-namespace Kutny\Orm\Grid;
+namespace Ytnuk\Orm\Grid;
 
-use Kutny;
+use Ytnuk;
 
 /**
  * Class Control
  *
- * @package Kutny\Orm
+ * @package Ytnuk\Orm
  */
-final class Control extends Kutny\Application\Control
+final class Control extends Ytnuk\Application\Control
 {
 
 	/**
-	 * @var Kutny\Orm\Repository
+	 * @var Ytnuk\Orm\Repository
 	 */
 	private $repository;
 
 	/**
-	 * @var Kutny\Orm\Form\Factory
+	 * @var Ytnuk\Orm\Form\Factory
 	 */
 	private $form;
 
 	/**
-	 * @param Kutny\Orm\Repository $repository
-	 * @param Kutny\Orm\Form\Factory $form
+	 * @param Ytnuk\Orm\Repository $repository
+	 * @param Ytnuk\Orm\Form\Factory $form
 	 */
-	public function __construct(Kutny\Orm\Repository $repository, Kutny\Orm\Form\Factory $form)
+	public function __construct(Ytnuk\Orm\Repository $repository, Ytnuk\Orm\Form\Factory $form)
 	{
 		$this->repository = $repository;
 		$this->form = $form;
@@ -37,7 +37,7 @@ final class Control extends Kutny\Application\Control
 	 */
 	protected function createComponentGrid()
 	{
-		$grid = new Kutny\Grid\Control(function (Kutny\Orm\Entity $entity = NULL) {
+		$grid = new Ytnuk\Grid\Control(function (Ytnuk\Orm\Entity $entity = NULL) {
 			if ( ! $entity) {
 				$entityClass = $this->repository->getEntityClassName([]);
 				$entity = new $entityClass;

@@ -1,17 +1,17 @@
 <?php
 
-namespace Kutny\Orm;
+namespace Ytnuk\Orm;
 
 use Nette;
 use Nextras;
-use Kutny;
+use Ytnuk;
 
 /**
  * Class Form
  *
- * @package Kutny\Orm
+ * @package Ytnuk\Orm
  */
-final class Form extends Kutny\Form
+final class Form extends Ytnuk\Form
 {
 
 	/**

@@ -1,16 +1,16 @@
 <?php
-namespace Kutny\Orm;
+namespace Ytnuk\Orm;
 
 use Kdyby;
 use Nextras;
-use Kutny;
+use Ytnuk;
 
 /**
  * Class Extension
  *
- * @package Kutny\Orm
+ * @package Ytnuk\Orm
  */
-final class Extension extends Nextras\Orm\DI\OrmExtension implements Kutny\Config\Provider
+final class Extension extends Nextras\Orm\DI\OrmExtension implements Ytnuk\Config\Provider
 {
 
 	/**
@@ -28,7 +28,7 @@ final class Extension extends Nextras\Orm\DI\OrmExtension implements Kutny\Confi
 	{
 		return [
 			self::class => $this->defaults,
-			Kutny\Form\Extension::class => [
+			Ytnuk\Form\Extension::class => [
 				'forms' => [
 					$this->prefix('form')
 				]

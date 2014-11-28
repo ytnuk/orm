@@ -1,13 +1,13 @@
 <?php
 
-namespace Kutny\Orm;
+namespace Ytnuk\Orm;
 
 use Nextras;
 
 /**
  * Class Entity
  *
- * @package Kutny\Orm
+ * @package Ytnuk\Orm
  */
 abstract class Entity extends Nextras\Orm\Entity\Entity
 {

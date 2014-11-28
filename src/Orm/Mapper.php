@@ -1,13 +1,13 @@
 <?php
 
-namespace Kutny\Orm;
+namespace Ytnuk\Orm;
 
 use Nextras;
 
 /**
  * Class Mapper
  *
- * @package Kutny\Orm
+ * @package Ytnuk\Orm
  */
 abstract class Mapper extends Nextras\Orm\Mapper\Mapper
 {

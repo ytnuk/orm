@@ -1,21 +1,21 @@
 <?php
 
-namespace Kutny\Orm\Grid\Control;
+namespace Ytnuk\Orm\Grid\Control;
 
-use Kutny;
+use Ytnuk;
 
 /**
  * Interface Factory
  *
- * @package Kutny\Orm
+ * @package Ytnuk\Orm
  */
 interface Factory
 {
 
 	/**
-	 * @param Kutny\Orm\Repository $repository
+	 * @param Ytnuk\Orm\Repository $repository
 	 *
-	 * @return Kutny\Orm\Grid\Control
+	 * @return Ytnuk\Orm\Grid\Control
 	 */
 	public function create($repository);
 }

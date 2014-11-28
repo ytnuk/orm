@@ -1,21 +1,21 @@
 <?php
 
-namespace Kutny\Orm\Form;
+namespace Ytnuk\Orm\Form;
 
-use Kutny;
+use Ytnuk;
 
 /**
  * Interface Factory
  *
- * @package Kutny\Orm
+ * @package Ytnuk\Orm
  */
 interface Factory
 {
 
 	/**
-	 * @param Kutny\Orm\Entity $entity
+	 * @param Ytnuk\Orm\Entity $entity
 	 *
-	 * @return Kutny\Orm\Form
+	 * @return Ytnuk\Orm\Form
 	 */
 	public function create($entity);
 }

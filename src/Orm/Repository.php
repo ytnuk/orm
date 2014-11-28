@@ -1,13 +1,13 @@
 <?php
 
-namespace Kutny\Orm;
+namespace Ytnuk\Orm;
 
 use Nextras;
 
 /**
  * Class Repository
  *
- * @package Kutny\Orm
+ * @package Ytnuk\Orm
  */
 abstract class Repository extends Nextras\Orm\Repository\Repository
 {
