@@ -1,17 +1,17 @@
 <?php
 
-namespace WebEdit\Orm;
+namespace Kutny\Orm;
 
 use Nette;
 use Nextras;
-use WebEdit;
+use Kutny;
 
 /**
  * Class Form
  *
- * @package WebEdit\Orm
+ * @package Kutny\Orm
  */
-final class Form extends WebEdit\Form
+final class Form extends Kutny\Form
 {
 
 	/**

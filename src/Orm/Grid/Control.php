@@ -1,32 +1,32 @@
 <?php
 
-namespace WebEdit\Orm\Grid;
+namespace Kutny\Orm\Grid;
 
-use WebEdit;
+use Kutny;
 
 /**
  * Class Control
  *
- * @package WebEdit\Orm
+ * @package Kutny\Orm
  */
-final class Control extends WebEdit\Application\Control
+final class Control extends Kutny\Application\Control
 {
 
 	/**
-	 * @var WebEdit\Orm\Repository
+	 * @var Kutny\Orm\Repository
 	 */
 	private $repository;
 
 	/**
-	 * @var WebEdit\Orm\Form\Factory
+	 * @var Kutny\Orm\Form\Factory
 	 */
 	private $form;
 
 	/**
-	 * @param WebEdit\Orm\Repository $repository
-	 * @param WebEdit\Orm\Form\Factory $form
+	 * @param Kutny\Orm\Repository $repository
+	 * @param Kutny\Orm\Form\Factory $form
 	 */
-	public function __construct(WebEdit\Orm\Repository $repository, WebEdit\Orm\Form\Factory $form)
+	public function __construct(Kutny\Orm\Repository $repository, Kutny\Orm\Form\Factory $form)
 	{
 		$this->repository = $repository;
 		$this->form = $form;
@@ -37,7 +37,7 @@ final class Control extends WebEdit\Application\Control
 	 */
 	protected function createComponentGrid()
 	{
-		$grid = new WebEdit\Grid\Control(function (WebEdit\Orm\Entity $entity = NULL) {
+		$grid = new Kutny\Grid\Control(function (Kutny\Orm\Entity $entity = NULL) {
 			if ( ! $entity) {
 				$entityClass = $this->repository->getEntityClassName([]);
 				$entity = new $entityClass;

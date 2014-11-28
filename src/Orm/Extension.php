@@ -1,16 +1,16 @@
 <?php
-namespace WebEdit\Orm;
+namespace Kutny\Orm;
 
 use Kdyby;
 use Nextras;
-use WebEdit;
+use Kutny;
 
 /**
  * Class Extension
  *
- * @package WebEdit\Orm
+ * @package Kutny\Orm
  */
-final class Extension extends Nextras\Orm\DI\OrmExtension implements WebEdit\Config\Provider
+final class Extension extends Nextras\Orm\DI\OrmExtension implements Kutny\Config\Provider
 {
 
 	/**
@@ -28,7 +28,7 @@ final class Extension extends Nextras\Orm\DI\OrmExtension implements WebEdit\Con
 	{
 		return [
 			self::class => $this->defaults,
-			WebEdit\Form\Extension::class => [
+			Kutny\Form\Extension::class => [
 				'forms' => [
 					$this->prefix('form')
 				]

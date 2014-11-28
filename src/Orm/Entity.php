@@ -1,13 +1,13 @@
 <?php
 
-namespace WebEdit\Orm;
+namespace Kutny\Orm;
 
 use Nextras;
 
 /**
  * Class Entity
  *
- * @package WebEdit\Orm
+ * @package Kutny\Orm
  */
 abstract class Entity extends Nextras\Orm\Entity\Entity
 {

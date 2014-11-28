@@ -1,13 +1,13 @@
 <?php
 
-namespace WebEdit\Orm;
+namespace Kutny\Orm;
 
 use Nextras;
 
 /**
  * Class Database
  *
- * @package WebEdit\Orm
+ * @package Kutny\Orm
  */
 final class Model extends Nextras\Orm\Model\DIModel
 {

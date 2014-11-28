@@ -1,21 +1,21 @@
 <?php
 
-namespace WebEdit\Orm\Grid\Control;
+namespace Kutny\Orm\Grid\Control;
 
-use WebEdit;
+use Kutny;
 
 /**
  * Interface Factory
  *
- * @package WebEdit\Orm
+ * @package Kutny\Orm
  */
 interface Factory
 {
 
 	/**
-	 * @param WebEdit\Orm\Repository $repository
+	 * @param Kutny\Orm\Repository $repository
 	 *
-	 * @return WebEdit\Orm\Grid\Control
+	 * @return Kutny\Orm\Grid\Control
 	 */
 	public function create($repository);
 }

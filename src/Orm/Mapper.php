@@ -1,13 +1,13 @@
 <?php
 
-namespace WebEdit\Orm;
+namespace Kutny\Orm;
 
 use Nextras;
 
 /**
  * Class Mapper
  *
- * @package WebEdit\Orm
+ * @package Kutny\Orm
  */
 abstract class Mapper extends Nextras\Orm\Mapper\Mapper
 {

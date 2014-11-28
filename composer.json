@@ -1,14 +1,14 @@
 {
-	"name": "webedit/orm",
+	"name": "kutny/orm",
 	"require": {
 		"nextras/orm": "dev-master",
-		"webedit/config": "dev-master",
-		"webedit/grid": "dev-master",
-		"webedit/form": "dev-master"
+		"kutny/config": "dev-master",
+		"kutny/grid": "dev-master",
+		"kutny/form": "dev-master"
 	},
 	"autoload": {
 		"psr-4": {
-			"WebEdit\\": "src/"
+			"Kutny\\": "src/"
 		}
 	}
 }

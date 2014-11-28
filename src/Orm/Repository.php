@@ -1,13 +1,13 @@
 <?php
 
-namespace WebEdit\Orm;
+namespace Kutny\Orm;
 
 use Nextras;
 
 /**
  * Class Repository
  *
- * @package WebEdit\Orm
+ * @package Kutny\Orm
  */
 abstract class Repository extends Nextras\Orm\Repository\Repository
 {
