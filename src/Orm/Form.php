@@ -64,6 +64,9 @@ final class Form extends Ytnuk\Form
 		$this->repository->flush($this->entity);
 	}
 
+	/**
+	 * @return string
+	 */
 	public function formatMessage()
 	{
 		$message = parent::formatMessage();
@@ -80,6 +83,9 @@ final class Form extends Ytnuk\Form
 		$presenter->redirect('Presenter:view', $this->entity->id);
 	}
 
+	/**
+	 * @return Nette\Application\UI\Control|Nette\Application\UI\Presenter|NULL
+	 */
 	protected function getParentControl()
 	{
 		return $this->submittedBy('delete') && $this->isValid() ? $this->getPresenter() : parent::getParentControl();

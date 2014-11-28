@@ -14,6 +14,9 @@ abstract class Entity extends Nextras\Orm\Entity\Entity
 
 	const PROPERTY_NAME = 'id';
 
+	/**
+	 * @return string
+	 */
 	public function __toString()
 	{
 		$property = self::PROPERTY_NAME;
