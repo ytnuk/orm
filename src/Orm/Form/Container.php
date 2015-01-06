@@ -75,7 +75,7 @@ abstract class Container extends Ytnuk\Form\Container
 				$value = $this->getComponent($property)
 					->setEntityValues($value);
 			}
-			$this->entity->setValue($property, $value ? : NULL);
+			$this->entity->setValue($property, $value !== '' ? $value : NULL);
 		}
 
 		return $this->entity;
