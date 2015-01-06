@@ -125,7 +125,7 @@ final class Form extends Ytnuk\Form
 	{
 		$this->addGroup('orm.form.action.group');
 		$action = $this->addContainer('action');
-		if ($this->entity->getId()) {
+		if ($this->entity->id) {
 			$action->addSubmit('edit', 'orm.form.action.edit.label');
 			$action->addSubmit('delete', 'orm.form.action.delete.label')
 				->setValidationScope(FALSE);

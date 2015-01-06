@@ -9,7 +9,7 @@ use Nextras;
  *
  * @package Ytnuk\Orm
  */
-final class Model extends Nextras\Orm\Model\DIModel
+final class Model extends Nextras\Orm\Model\Model
 {
 
 }

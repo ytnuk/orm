@@ -10,7 +10,7 @@ use Ytnuk;
  *
  * @package Ytnuk\Orm
  */
-final class Extension extends Nextras\Orm\DI\OrmExtension implements Ytnuk\Config\Provider
+final class Extension extends Nextras\Orm\Bridge\NetteDI\OrmExtension implements Ytnuk\Config\Provider
 {
 
 	/**
@@ -61,19 +61,7 @@ final class Extension extends Nextras\Orm\DI\OrmExtension implements Ytnuk\Confi
 	protected function getRepositoryList($model)
 	{
 		$config = $this->getConfig($this->defaults);
-		$repositories = parent::getRepositoryList($model);
-		foreach ($config['repositories'] as $name => $repository) {
-			$repositories[] = [
-				'name' => $name,
-				'serviceName' => $this->prefix('repositories.' . $name),
-				'class' => $repository,
-				'entities' => call_user_func([
-					$repository,
-					'getEntityClassNames'
-				]),
-			];
-		}
 
-		return $repositories;
+		return parent::getRepositoryList($model) + $config['repositories'];
 	}
 }

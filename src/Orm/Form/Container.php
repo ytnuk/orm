@@ -135,7 +135,7 @@ abstract class Container extends Ytnuk\Form\Container
 		}
 		if ($this->entity->hasValue($property->name)) {
 			$value = $this->entity->getValue($property->name);
-			$input->setDefaultValue($value instanceof Ytnuk\Orm\Entity ? $value->getId() : $value);
+			$input->setDefaultValue($value instanceof Ytnuk\Orm\Entity ? $value->id : $value);
 		}
 		$input->setAttribute('placeholder', $this->formatPropertyPlaceholder($property));
 	}
@@ -232,7 +232,7 @@ abstract class Container extends Ytnuk\Form\Container
 		$primaryKeys = $entity->getMetadata()
 			->getPrimaryKey();
 		$primaryKey = reset($primaryKeys);
-		$items = $this->repository->findBy([$primaryKey . '!=' => $this->entity->getId()])
+		$items = $this->repository->findBy([$primaryKey . '!=' => $this->entity->id])
 			->fetchPairs($primaryKey, $entity::PROPERTY_NAME);
 
 		return $this->addSelect($property->name, $this->formatPropertyLabel($property), [])
