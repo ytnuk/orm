@@ -35,7 +35,7 @@ final class Control extends Ytnuk\Application\Control
 	/**
 	 * @return Control
 	 */
-	protected function createComponentGrid()
+	protected function createComponentYtnukGridControl()
 	{
 		$grid = new Ytnuk\Grid\Control(function (Ytnuk\Orm\Entity $entity = NULL) {
 			if ( ! $entity) {

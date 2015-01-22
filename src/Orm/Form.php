@@ -74,15 +74,6 @@ final class Form extends Ytnuk\Form
 		return $this->submittedBy() ? 'orm.' . $message : $message;
 	}
 
-	public function redirect()
-	{
-		$presenter = $this->getPresenter();
-		if ($this->submittedBy('delete') && $this->isValid()) {
-			$presenter->redirect('Presenter:list');
-		}
-		$presenter->redirect('Presenter:view', $this->entity->id);
-	}
-
 	/**
 	 * @return Nette\Application\UI\Control|Nette\Application\UI\Presenter|NULL
 	 */
@@ -99,10 +90,6 @@ final class Form extends Ytnuk\Form
 		parent::attached($control);
 		$this->addEntityContainer();
 		$this->addActionContainer();
-		$this->onSubmit[] = [
-			$this,
-			'redirect'
-		];
 	}
 
 	/**
