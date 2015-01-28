@@ -10,7 +10,7 @@ use Ytnuk;
  *
  * @package Ytnuk\Database
  */
-abstract class Container extends Ytnuk\Form\Container
+abstract class Container extends Ytnuk\Form\Container //TODO: use extra inputs from Nextras\Forms
 {
 
 	/**
