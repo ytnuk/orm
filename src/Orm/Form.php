@@ -50,12 +50,11 @@ final class Form extends Ytnuk\Form
 		];
 	}
 
-	public function success() //TODO: use passed $form and $values
+	public function success(self $form, $values)
 	{
-		if ($this->submitted === TRUE || $this->submitted->name != 'delete') {
-			$values = $this->getValues(TRUE);
+		if ($form->submitted === TRUE || $form->submitted->name != 'delete') {
 			$this->getComponent('this')
-				->setEntityValues($values['this']);
+				->setEntityValues($values->this);
 			$this->repository->persist($this->entity);
 		} else {
 			$this->getComponent('this')

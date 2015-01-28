@@ -4,6 +4,7 @@ namespace Ytnuk\Orm\Form;
 
 use Nextras;
 use Ytnuk;
+use Nette;
 
 /**
  * Class Container
@@ -64,14 +65,14 @@ abstract class Container extends Ytnuk\Form\Container //TODO: use extra inputs f
 	}
 
 	/**
-	 * @param array $values
+	 * @param Nette\Utils\ArrayHash $values
 	 *
 	 * @return Ytnuk\Orm\Entity
 	 */
-	public function setEntityValues(array $values)
+	public function setEntityValues(Nette\Utils\ArrayHash $values)
 	{
 		foreach ($values as $property => $value) {
-			if (is_array($value)) {
+			if ($value instanceof Nette\Utils\ArrayHash) {
 				$value = $this->getComponent($property)
 					->setEntityValues($value);
 			}
@@ -115,7 +116,7 @@ abstract class Container extends Ytnuk\Form\Container //TODO: use extra inputs f
 	protected function addProperties(array $properties)
 	{
 		foreach ($properties as $property) {
-			if (in_array($property->name, $this->metadata->getPrimaryKey())) {
+			if (in_array($property->name, $this->metadata->getPrimaryKey()) || $property->isVirtual) {
 				continue;
 			}
 			$this->addProperty($property);
@@ -159,16 +160,23 @@ abstract class Container extends Ytnuk\Form\Container //TODO: use extra inputs f
 				$method
 			], $property);
 		}
+		if ( ! $property->container || $property->container === Nextras\Orm\Relationships\OneHasMany::class && $property->relationshipRepository === $this->repository->reflection->name) {
+			return NULL;
+		}
 		switch ($property->container) {
 			case Nextras\Orm\Relationships\OneHasOneDirected::class:
 				$this->addPropertyOneHasOneDirected($property);
-				break;
+
+				return NULL;
 			case Nextras\Orm\Relationships\ManyHasOne::class:
 				return $this->addPropertyManyHasOne($property);
-				break;
-		}
+			case Nextras\Orm\Relationships\OneHasMany::class:
+				$this->addPropertyOneHasMany($property);
 
-		return NULL;
+				return NULL;
+			default:
+				throw new Nextras\Orm\NotImplementedException;
+		}
 	}
 
 	/**
@@ -235,9 +243,8 @@ abstract class Container extends Ytnuk\Form\Container //TODO: use extra inputs f
 		$items = $this->repository->findBy([$primaryKey . '!=' => $this->entity->id])
 			->fetchPairs($primaryKey, $entity::PROPERTY_NAME);
 
-		return $this->addSelect($property->name, $this->formatPropertyLabel($property), [])
-			->setPrompt($this->formatPropertyPrompt($property))
-			->setItems($items);
+		return $this->addSelect($property->name, $this->formatPropertyLabel($property), $items)
+			->setPrompt($this->formatPropertyPrompt($property));
 	}
 
 	/**
@@ -268,6 +275,22 @@ abstract class Container extends Ytnuk\Form\Container //TODO: use extra inputs f
 	protected function formatPropertyPrompt(Nextras\Orm\Entity\Reflection\PropertyMetadata $property)
 	{
 		return $this->prefixProperty($property) . '.placeholder';
+	}
+
+	/**
+	 * @param Nextras\Orm\Entity\Reflection\PropertyMetadata $property
+	 *
+	 * @return \Nette\Forms\Container|NULL
+	 */
+	protected function addPropertyOneHasMany(Nextras\Orm\Entity\Reflection\PropertyMetadata $property)
+	{
+		$repository = $this->model->getRepository($property->relationshipRepository);
+		$relationshipEntityClass = $repository->getEntityMetadata()
+			->getClassName();
+		$entity = new $relationshipEntityClass;
+
+		//TODO: addDynamic whole container for property
+		return $this->addEntityContainer($entity, $property->name);
 	}
 
 	/**
