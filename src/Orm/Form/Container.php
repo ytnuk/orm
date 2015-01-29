@@ -2,9 +2,10 @@
 
 namespace Ytnuk\Orm\Form;
 
+use Kdyby;
+use Nette;
 use Nextras;
 use Ytnuk;
-use Nette;
 
 /**
  * Class Container
@@ -43,13 +44,10 @@ abstract class Container extends Ytnuk\Form\Container //TODO: use extra inputs f
 	 * @param Ytnuk\Orm\Entity $entity
 	 * @param Ytnuk\Orm\Repository $repository
 	 */
-	public function __construct(Ytnuk\Orm\Entity $entity, Ytnuk\Orm\Repository $repository)
+	public function __construct(Ytnuk\Orm\Entity $entity = NULL, Ytnuk\Orm\Repository $repository = NULL)
 	{
 		$this->entity = $entity;
-		$this->metadata = $entity->getMetadata();
 		$this->repository = $repository;
-		$this->mapper = $this->repository->getMapper();
-		$this->model = $this->repository->getModel();
 		$this->monitor(Ytnuk\Form::class);
 	}
 
@@ -72,11 +70,20 @@ abstract class Container extends Ytnuk\Form\Container //TODO: use extra inputs f
 	public function setEntityValues(Nette\Utils\ArrayHash $values)
 	{
 		foreach ($values as $property => $value) {
-			if ($value instanceof Nette\Utils\ArrayHash) {
-				$value = $this->getComponent($property)
-					->setEntityValues($value);
+			if ($this[$property] instanceof Kdyby\Replicator\Container) {
+				//TODO:
+				continue;
+			} elseif ($value instanceof Nette\Utils\ArrayHash) {
+				$container = $this->getComponent($property);
+				if ($container instanceof self) {
+					$container->setEntityValues($value);
+				} else {
+					$container->setValues($value);
+				}
 			}
-			$this->entity->setValue($property, $value !== '' ? $value : NULL);
+			if ($this->isValid()) {
+				$this->entity->setValue($property, $value !== '' ? $value : NULL);
+			}
 		}
 
 		return $this->entity;
@@ -88,7 +95,23 @@ abstract class Container extends Ytnuk\Form\Container //TODO: use extra inputs f
 	protected function attached($form)
 	{
 		parent::attached($form);
-		$this->setCurrentGroup($form->addGroup($this->getGroupName()));
+		if ($this->entity && $this->repository) {
+			$this->init($this->entity, $this->repository);
+		}
+	}
+
+	public function init(Ytnuk\Orm\Entity $entity, Ytnuk\Orm\Repository $repository)
+	{
+		if ( ! $this->parent) {
+			throw new Nextras\Orm\InvalidStateException;
+		}
+		$this->entity = $entity;
+		$this->metadata = $entity->getMetadata();
+		$this->repository = $repository;
+		$this->mapper = $repository->getMapper();
+		$this->model = $repository->getModel();
+		$this->setCurrentGroup($this->getForm()
+			->addGroup($this->getGroupName()));
 		$this->addProperties($this->metadata->getProperties());
 	}
 
@@ -213,18 +236,23 @@ abstract class Container extends Ytnuk\Form\Container //TODO: use extra inputs f
 
 	/**
 	 * @param Ytnuk\Orm\Entity $entity
-	 * @param string $name
+	 * @param $name
 	 *
 	 * @return self
 	 */
 	public function addEntityContainer(Ytnuk\Orm\Entity $entity, $name)
+	{
+		return $this->addComponent($this->createEntityContainer($entity), $name);
+	}
+
+	protected function createEntityContainer(Ytnuk\Orm\Entity $entity)
 	{
 		$class = rtrim($entity->getMetadata()
 				->getClassName(), 'a..zA..Z') . 'Form\Container';
 		$repository = $this->model->getRepositoryForEntity($entity);
 		$repository->attach($entity);
 
-		return $this->addComponent(new $class($entity, $repository), $name);
+		return new $class($entity, $repository);
 	}
 
 	/**
@@ -288,9 +316,28 @@ abstract class Container extends Ytnuk\Form\Container //TODO: use extra inputs f
 		$relationshipEntityClass = $repository->getEntityMetadata()
 			->getClassName();
 		$entity = new $relationshipEntityClass;
+		$container = $this->addDynamic($property->name, function (Nette\Forms\Container $container) use ($entity, $repository, $property) {
+			//TODO: bad container when adding more than one
+			if ($container instanceof self) {
+				$container->init($entity, $repository);
+			}
+			$container->addSubmit('remove', 'Remove')
+				->setValidationScope(FALSE)->onClick[] = function (Nette\Forms\Controls\SubmitButton $button) {
+				$replicator = $button->parent->parent;
+				$replicator->remove($button->parent, TRUE);
+			};
+		});
+		$container->addSubmit('add', 'Add')
+			->setValidationScope(FALSE)->onClick[] = function (Nette\Forms\Controls\SubmitButton $button) {
+			$replicator = $button->parent;
+			if ($replicator->isAllFilled()) {
+				$replicator->createOne();
+			}
+		};
+		$container->containerClass = rtrim($entity->getMetadata()
+				->getClassName(), 'a..zA..Z') . 'Form\Container';
 
-		//TODO: addDynamic whole container for property
-		return $this->addEntityContainer($entity, $property->name);
+		return $container;
 	}
 
 	/**

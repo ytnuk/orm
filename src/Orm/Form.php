@@ -52,15 +52,17 @@ final class Form extends Ytnuk\Form
 
 	public function success(self $form, $values)
 	{
-		if ($form->submitted === TRUE || $form->submitted->name != 'delete') {
-			$this->getComponent('this')
-				->setEntityValues($values->this);
-			$this->repository->persist($this->entity);
-		} else {
-			$this->getComponent('this')
-				->removeEntity();
+		if ( ! is_object($form->submitted)) {
+			throw new Nextras\Orm\NotImplementedException;
 		}
-		$this->repository->flush($this->entity);
+		$container = $this->getComponent('this');
+		$container->setEntityValues($values->this);
+		if ((isset($this['action']['add']) && $this['action']['add']->htmlId === $form->submitted->htmlId) || (isset($this['action']['edit']) && $this['action']['edit']->htmlId === $form->submitted->htmlId)) {
+			$this->repository->persistAndFlush($this->entity);
+		} elseif (isset($this['action']['delete']) && $this['action']['delete']->htmlId === $form->submitted->htmlId) {
+			$container->removeEntity();
+			$this->repository->flush();
+		}
 	}
 
 	/**
