@@ -67,7 +67,7 @@ abstract class Container extends Ytnuk\Form\Container //TODO: use extra inputs f
 	 *
 	 * @return Ytnuk\Orm\Entity
 	 */
-	public function setEntityValues(Nette\Utils\ArrayHash $values)
+	public function setEntityValues(Nette\Utils\ArrayHash $values) //TODO: fuck everything in this class!
 	{
 		foreach ($values as $property => $value) {
 			if ($this[$property] instanceof Kdyby\Replicator\Container) {
@@ -317,26 +317,19 @@ abstract class Container extends Ytnuk\Form\Container //TODO: use extra inputs f
 			->getClassName();
 		$entity = new $relationshipEntityClass;
 		$container = $this->addDynamic($property->name, function (Nette\Forms\Container $container) use ($entity, $repository, $property) {
-			//TODO: bad container when adding more than one
 			if ($container instanceof self) {
 				$container->init($entity, $repository);
 			}
-			$container->addSubmit('remove', 'Remove')
-				->setValidationScope(FALSE)->onClick[] = function (Nette\Forms\Controls\SubmitButton $button) {
-				$replicator = $button->parent->parent;
-				$replicator->remove($button->parent, TRUE);
-			};
+			$container->addSubmit('delete', 'Delete')
+				->setValidationScope(FALSE)
+				->addRemoveOnClick();
 		});
-		$container->addSubmit('add', 'Add')
-			->setValidationScope(FALSE)->onClick[] = function (Nette\Forms\Controls\SubmitButton $button) {
-			$replicator = $button->parent;
-			if ($replicator->isAllFilled()) {
-				$replicator->createOne();
-			}
-		};
+		$container->addSubmit('add', 'Add')//TODO: when filled should recreate with that values, and add next empty one
+		->setValidationScope(FALSE)
+			->addCreateOnClick();
 		$container->containerClass = rtrim($entity->getMetadata()
-				->getClassName(), 'a..zA..Z') . 'Form\Container';
-
+				->getClassName(), 'a..zA..Z') . 'Form\Container'; //TODO: is it really needed?
+		//TODO: fix rendering at end of form
 		return $container;
 	}
 

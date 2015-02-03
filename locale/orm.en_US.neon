@@ -6,21 +6,21 @@ form:
 			success:
 				message: Adding was successfull.
 			error:
-				message: Adding was unsuccessfull.
+				warning: Adding was unsuccessfull.
 		edit:
 			label: Edit
 			success:
 				message: Editing was successfull.
 			error:
-				message: Editing was unsuccessfull.
+				warning: Editing was unsuccessfull.
 		delete:
 			label: Delete
 			success:
 				message: Deleting was successfull.
 			error:
-				message: Deleting was unsuccessfull.
+				warning: Deleting was unsuccessfull.
 		success:
 			message: Action was successfull.
-		error:
+		warning:
 			message: Action was unsuccessfull.
 

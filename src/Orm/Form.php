@@ -52,16 +52,17 @@ final class Form extends Ytnuk\Form
 
 	public function success(self $form, $values)
 	{
-		if ( ! is_object($form->submitted)) {
-			throw new Nextras\Orm\NotImplementedException;
-		}
 		$container = $this->getComponent('this');
 		$container->setEntityValues($values->this);
-		if ((isset($this['action']['add']) && $this['action']['add']->htmlId === $form->submitted->htmlId) || (isset($this['action']['edit']) && $this['action']['edit']->htmlId === $form->submitted->htmlId)) {
-			$this->repository->persistAndFlush($this->entity);
-		} elseif (isset($this['action']['delete']) && $this['action']['delete']->htmlId === $form->submitted->htmlId) {
-			$container->removeEntity();
-			$this->repository->flush();
+		switch ($form->submitted) {
+			case $this['action']['add']:
+			case $this['action']['edit']:
+				$this->repository->persistAndFlush($this->entity);
+				break;
+			case $this['action']['delete']:
+				$container->removeEntity();
+				$this->repository->flush();
+				break;
 		}
 	}
 
@@ -113,13 +114,13 @@ final class Form extends Ytnuk\Form
 	{
 		$this->addGroup('orm.form.action.group');
 		$action = $this->addContainer('action');
-		if ($this->entity->id) {
-			$action->addSubmit('edit', 'orm.form.action.edit.label');
-			$action->addSubmit('delete', 'orm.form.action.delete.label')
-				->setValidationScope(FALSE);
-		} else {
-			$action->addSubmit('add', 'orm.form.action.add.label');
-		}
+		$action->addSubmit('add', 'orm.form.action.add.label')
+			->setDisabled($this->entity->id);
+		$action->addSubmit('edit', 'orm.form.action.edit.label')
+			->setDisabled(! $this->entity->id);
+		$action->addSubmit('delete', 'orm.form.action.delete.label')
+			->setValidationScope(FALSE)
+			->setDisabled(! $this->entity->id);
 
 		return $action;
 	}
