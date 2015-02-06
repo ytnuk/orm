@@ -17,5 +17,5 @@ interface Factory
 	 *
 	 * @return Ytnuk\Orm\Grid\Control
 	 */
-	public function create($repository);
+	public function create(Ytnuk\Orm\Repository $repository);
 }

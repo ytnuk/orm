@@ -17,5 +17,5 @@ interface Factory
 	 *
 	 * @return Ytnuk\Orm\Form
 	 */
-	public function create($entity);
+	public function create(Ytnuk\Orm\Entity $entity);
 }

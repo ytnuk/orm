@@ -34,16 +34,8 @@ final class Extension extends Nextras\Orm\Bridge\NetteDI\OrmExtension implements
 				]
 			],
 			'services' => [
-				$this->prefix('form') => [
-					'implement' => Form\Factory::class,
-					'parameters' => ['entity'],
-					'arguments' => ['%entity%']
-				],
-				$this->prefix('gridControl') => [
-					'implement' => Grid\Control\Factory::class,
-					'parameters' => ['repository'],
-					'arguments' => ['%repository%']
-				]
+				$this->prefix('form') => Form\Factory::class,
+				Grid\Control\Factory::class
 			],
 			Kdyby\Translation\DI\TranslationExtension::class => [
 				'dirs' => [
