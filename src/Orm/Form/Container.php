@@ -268,7 +268,7 @@ abstract class Container extends Ytnuk\Form\Container //TODO: use extra inputs f
 		$primaryKeys = $entity->getMetadata()
 			->getPrimaryKey();
 		$primaryKey = reset($primaryKeys);
-		$items = $this->repository->findBy([$primaryKey . '!=' => $this->entity->id])
+		$items = $repository->findAll()
 			->fetchPairs($primaryKey, $entity::PROPERTY_NAME);
 
 		return $this->addSelect($property->name, $this->formatPropertyLabel($property), $items)
