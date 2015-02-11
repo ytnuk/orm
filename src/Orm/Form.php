@@ -77,14 +77,6 @@ final class Form extends Ytnuk\Form
 	}
 
 	/**
-	 * @return Nette\Application\UI\Control|Nette\Application\UI\Presenter|NULL
-	 */
-	protected function getParentControl()
-	{
-		return $this->submittedBy('delete') && $this->isValid() ? $this->getPresenter() : parent::getParentControl();
-	}
-
-	/**
 	 * @param $control
 	 */
 	protected function attached($control)
