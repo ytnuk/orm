@@ -73,7 +73,7 @@ final class Form extends Ytnuk\Form
 	{
 		$message = parent::formatMessage();
 
-		return $this->submittedBy() ? 'orm.' . $message : $message;
+		return $this->isSubmitted() ? 'orm.' . $message : $message;
 	}
 
 	/**

@@ -100,9 +100,9 @@ abstract class Container extends Ytnuk\Form\Container //TODO: use extra inputs f
 		}
 	}
 
-	public function init(Ytnuk\Orm\Entity $entity, Ytnuk\Orm\Repository $repository)
+	public function init(Ytnuk\Orm\Entity $entity, Nextras\Orm\Repository\IRepository $repository)
 	{
-		if ( ! $this->parent) {
+		if ( ! $this->getParent()) {
 			throw new Nextras\Orm\InvalidStateException;
 		}
 		$this->entity = $entity;
@@ -183,7 +183,9 @@ abstract class Container extends Ytnuk\Form\Container //TODO: use extra inputs f
 				$method
 			], $property);
 		}
-		if ( ! $property->container || $property->container === Nextras\Orm\Relationships\OneHasMany::class && $property->relationshipRepository === $this->repository->reflection->name) {
+		if ( ! $property->container || $property->container === Nextras\Orm\Relationships\OneHasMany::class && $property->relationshipRepository === $this->repository->getReflection()
+				->getName()
+		) {
 			return NULL;
 		}
 		switch ($property->container) {

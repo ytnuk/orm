@@ -38,16 +38,21 @@ abstract class Control extends Ytnuk\Form\Control
 	{
 		$form = $this->form->create($this->entity);
 		$form->onSubmit[] = function (Ytnuk\Orm\Form $form) {
-			if ($this->presenter->isAjax()) {
+			if ($this->getPresenter()
+				->isAjax()
+			) {
 				$this->redrawControl();
 			}
 		};
 		$form->onSuccess[] = function (Ytnuk\Orm\Form $form) {
+			$presenter = $this->getPresenter();
 			switch ($form->submitted) {
 				case $form['action']['add']:
-					$this->presenter->redirect('Presenter:view', $this->entity->id);
+					$presenter->redirect('Presenter:view', $this->entity->id);
+					break;
 				case $form['action']['delete']:
-					$this->presenter->redirect('Presenter:list');
+					$presenter->redirect('Presenter:list');
+					break;
 			}
 		};
 
