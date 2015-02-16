@@ -10,7 +10,7 @@ use Ytnuk;
  *
  * @package Ytnuk\Orm
  */
-final class Extension extends Nextras\Orm\Bridge\NetteDI\OrmExtension implements Ytnuk\Config\Provider
+final class Extension extends Nextras\Orm\Bridges\NetteDI\OrmExtension implements Ytnuk\Config\Provider
 {
 
 	/**
