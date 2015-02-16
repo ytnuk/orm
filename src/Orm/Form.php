@@ -91,8 +91,7 @@ final class Form extends Ytnuk\Form
 	 */
 	public function addEntityContainer()
 	{
-		$class = rtrim($this->entity->getMetadata()
-				->getClassName(), 'a..zA..Z') . 'Form\Container';
+		$class = rtrim($this->entity->getMetadata()->getClassName(), 'a..zA..Z') . 'Form\Container';
 		$repository = $this->model->getRepositoryForEntity($this->entity);
 		$repository->attach($this->entity);
 
@@ -106,13 +105,9 @@ final class Form extends Ytnuk\Form
 	{
 		$this->addGroup('orm.form.action.group');
 		$action = $this->addContainer('action');
-		$action->addSubmit('add', 'orm.form.action.add.label')
-			->setDisabled($this->entity->id);
-		$action->addSubmit('edit', 'orm.form.action.edit.label')
-			->setDisabled(! $this->entity->id);
-		$action->addSubmit('delete', 'orm.form.action.delete.label')
-			->setValidationScope(FALSE)
-			->setDisabled(! $this->entity->id);
+		$action->addSubmit('add', 'orm.form.action.add.label')->setDisabled($this->entity->id);
+		$action->addSubmit('edit', 'orm.form.action.edit.label')->setDisabled(! $this->entity->id);
+		$action->addSubmit('delete', 'orm.form.action.delete.label')->setValidationScope(FALSE)->setDisabled(! $this->entity->id);
 
 		return $action;
 	}

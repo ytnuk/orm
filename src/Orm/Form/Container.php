@@ -55,8 +55,7 @@ abstract class Container extends Ytnuk\Form\Container //TODO: use extra inputs f
 	{
 		foreach ($this->metadata->getProperties() as $property) {
 			if ($property->container === Nextras\Orm\Relationships\OneHasOneDirected::class && $property->relationshipIsMain) {
-				$this->getComponent($property->name)
-					->removeEntity();
+				$this->getComponent($property->name)->removeEntity();
 			}
 		}
 		$this->repository->remove($this->entity);
@@ -110,8 +109,7 @@ abstract class Container extends Ytnuk\Form\Container //TODO: use extra inputs f
 		$this->repository = $repository;
 		$this->mapper = $repository->getMapper();
 		$this->model = $repository->getModel();
-		$this->setCurrentGroup($this->getForm()
-			->addGroup($this->getGroupName()));
+		$this->setCurrentGroup($this->getForm()->addGroup($this->getGroupName()));
 		$this->addProperties($this->metadata->getProperties());
 	}
 
@@ -183,8 +181,7 @@ abstract class Container extends Ytnuk\Form\Container //TODO: use extra inputs f
 				$method
 			], $property);
 		}
-		if ( ! $property->container || $property->container === Nextras\Orm\Relationships\OneHasMany::class && $property->relationshipRepository === $this->repository->getReflection()
-				->getName()
+		if ( ! $property->container || $property->container === Nextras\Orm\Relationships\OneHasMany::class && $property->relationshipRepository === $this->repository->getReflection()->getName()
 		) {
 			return NULL;
 		}
@@ -228,8 +225,7 @@ abstract class Container extends Ytnuk\Form\Container //TODO: use extra inputs f
 			$entity = $this->entity->getValue($property->name);
 		} else {
 			$repository = $this->model->getRepository($property->relationshipRepository);
-			$relationshipEntityClass = $repository->getEntityMetadata()
-				->getClassName();
+			$relationshipEntityClass = $repository->getEntityMetadata()->getClassName();
 			$entity = new $relationshipEntityClass;
 		}
 
@@ -249,8 +245,7 @@ abstract class Container extends Ytnuk\Form\Container //TODO: use extra inputs f
 
 	protected function createEntityContainer(Ytnuk\Orm\Entity $entity)
 	{
-		$class = rtrim($entity->getMetadata()
-				->getClassName(), 'a..zA..Z') . 'Form\Container';
+		$class = rtrim($entity->getMetadata()->getClassName(), 'a..zA..Z') . 'Form\Container';
 		$repository = $this->model->getRepositoryForEntity($entity);
 		$repository->attach($entity);
 
@@ -267,14 +262,11 @@ abstract class Container extends Ytnuk\Form\Container //TODO: use extra inputs f
 		$repository = $this->model->getRepository($property->relationshipRepository);
 		$class = $repository->getEntityClassName([]);
 		$entity = new $class;
-		$primaryKeys = $entity->getMetadata()
-			->getPrimaryKey();
+		$primaryKeys = $entity->getMetadata()->getPrimaryKey();
 		$primaryKey = reset($primaryKeys);
-		$items = $repository->findAll()
-			->fetchPairs($primaryKey, $entity::PROPERTY_NAME);
+		$items = $repository->findAll()->fetchPairs($primaryKey, $entity::PROPERTY_NAME);
 
-		return $this->addSelect($property->name, $this->formatPropertyLabel($property), $items)
-			->setPrompt($this->formatPropertyPrompt($property));
+		return $this->addSelect($property->name, $this->formatPropertyLabel($property), $items)->setPrompt($this->formatPropertyPrompt($property));
 	}
 
 	/**
@@ -315,22 +307,17 @@ abstract class Container extends Ytnuk\Form\Container //TODO: use extra inputs f
 	protected function addPropertyOneHasMany(Nextras\Orm\Entity\Reflection\PropertyMetadata $property)
 	{
 		$repository = $this->model->getRepository($property->relationshipRepository);
-		$relationshipEntityClass = $repository->getEntityMetadata()
-			->getClassName();
+		$relationshipEntityClass = $repository->getEntityMetadata()->getClassName();
 		$entity = new $relationshipEntityClass;
 		$container = $this->addDynamic($property->name, function (Nette\Forms\Container $container) use ($entity, $repository, $property) {
 			if ($container instanceof self) {
 				$container->init($entity, $repository);
 			}
-			$container->addSubmit('delete', 'Delete')
-				->setValidationScope(FALSE)
-				->addRemoveOnClick();
+			$container->addSubmit('delete', 'Delete')->setValidationScope(FALSE)->addRemoveOnClick();
 		});
 		$container->addSubmit('add', 'Add')//TODO: when filled should recreate with that values, and add next empty one
-		->setValidationScope(FALSE)
-			->addCreateOnClick();
-		$container->containerClass = rtrim($entity->getMetadata()
-				->getClassName(), 'a..zA..Z') . 'Form\Container'; //TODO: is it really needed?
+		->setValidationScope(FALSE)->addCreateOnClick();
+		$container->containerClass = rtrim($entity->getMetadata()->getClassName(), 'a..zA..Z') . 'Form\Container'; //TODO: is it really needed?
 		//TODO: fix rendering at end of form
 		return $container;
 	}
@@ -352,8 +339,7 @@ abstract class Container extends Ytnuk\Form\Container //TODO: use extra inputs f
 	 */
 	protected function addPropertyInt(Nextras\Orm\Entity\Reflection\PropertyMetadata $property)
 	{
-		return $this->addPropertyString($property)
-			->setType('number');
+		return $this->addPropertyString($property)->setType('number');
 	}
 
 	/**

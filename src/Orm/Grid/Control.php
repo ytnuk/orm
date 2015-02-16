@@ -49,17 +49,12 @@ final class Control extends Ytnuk\Application\Control
 
 			return $form;
 		}, function (array $order, array $filter) {
-			return $this->repository->findBy($this->prepareValues($filter))
-				->orderBy($this->prepareValues($order))
-				->fetchPairs('id');
+			return $this->repository->findBy($this->prepareValues($filter))->orderBy($this->prepareValues($order))->fetchPairs('id');
 		});
 
 		return $grid->setLink(function ($entity) {
-			return $entity ? $this->getPresenter()
-				->link('Presenter:view', ['id' => $entity->id]) : $this->getPresenter()
-				->link('Presenter:add');
-		})
-			->filterInputs(['this']);
+			return $entity ? $this->getPresenter()->link('Presenter:view', ['id' => $entity->id]) : $this->getPresenter()->link('Presenter:add');
+		})->filterInputs(['this']);
 	}
 
 	/**

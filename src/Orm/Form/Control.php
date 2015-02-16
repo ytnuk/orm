@@ -38,8 +38,7 @@ abstract class Control extends Ytnuk\Form\Control
 	{
 		$form = $this->form->create($this->entity);
 		$form->onSubmit[] = function (Ytnuk\Orm\Form $form) {
-			if ($this->getPresenter()
-				->isAjax()
+			if ($this->getPresenter()->isAjax()
 			) {
 				$this->redrawControl();
 			}
