@@ -20,7 +20,7 @@ abstract class Mapper extends Nextras\Orm\Mapper\Mapper
 		if ( ! $this->tableName) {
 			$namespace = explode('\\', $this->getReflection()->getNamespaceName());
 			array_shift($namespace);
-			$this->tableName = Nextras\Orm\StorageReflection\DbStorageReflection::underscore(implode($namespace));
+			$this->tableName = Nextras\Orm\StorageReflection\StringHelper::underscore(implode($namespace));
 		}
 
 		return $this->tableName;
