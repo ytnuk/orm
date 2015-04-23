@@ -53,7 +53,7 @@ final class Control extends Ytnuk\Application\Control
 		});
 
 		return $grid->setLink(function ($entity) {
-			return $entity ? $this->getPresenter()->link('Presenter:view', ['id' => $entity->id]) : $this->getPresenter()->link('Presenter:add');
+			return $entity ? $this->getPresenter()->link('Presenter:edit', ['id' => $entity->id]) : $this->getPresenter()->link('Presenter:add');
 		})->filterInputs(['this']);
 	}
 

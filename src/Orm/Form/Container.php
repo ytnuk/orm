@@ -68,8 +68,14 @@ abstract class Container extends Ytnuk\Form\Container //TODO: use extra inputs f
 	 */
 	public function setEntityValues(Nette\Utils\ArrayHash $values) //TODO: fuck everything in this class!
 	{
+		dump($values);
 		foreach ($values as $property => $value) {
 			if ($this[$property] instanceof Kdyby\Replicator\Container) {
+				$container = $this->getComponent($property);
+				foreach($values as $key => $value){
+					dump($container[(int)$key]->setValues((array)$value));
+				}
+				dump($container->getValues(TRUE));exit;
 				//TODO:
 				continue;
 			} elseif ($value instanceof Nette\Utils\ArrayHash) {
@@ -181,8 +187,7 @@ abstract class Container extends Ytnuk\Form\Container //TODO: use extra inputs f
 				$method
 			], $property);
 		}
-		if ( ! $property->container || $property->container === Nextras\Orm\Relationships\OneHasMany::class && $property->relationshipRepository === $this->repository->getReflection()->getName()
-		) {
+		if ( ! $property->container || ($property->container === Nextras\Orm\Relationships\OneHasMany::class && $property->relationshipRepository === $this->repository->getReflection()->getName())) {
 			return NULL;
 		}
 		switch ($property->container) {
@@ -310,6 +315,7 @@ abstract class Container extends Ytnuk\Form\Container //TODO: use extra inputs f
 		$relationshipEntityClass = $repository->getEntityMetadata()->getClassName();
 		$entity = new $relationshipEntityClass;
 		$container = $this->addDynamic($property->name, function (Nette\Forms\Container $container) use ($entity, $repository, $property) {
+			dump($container);exit; //TODO: container should always be instance of self
 			if ($container instanceof self) {
 				$container->init($entity, $repository);
 			}
