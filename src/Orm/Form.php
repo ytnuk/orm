@@ -61,21 +61,16 @@ final class Form extends Ytnuk\Form
 	}
 
 	/**
-	 * @param $message
-	 * @param string $type
-	 * @param Nette\Application\UI\Control $control
-	 *
-	 * @return \stdClass
+	 * @return Nette\Application\UI\Control
 	 */
-	public function flashMessage($message, $type = 'info', Nette\Application\UI\Control $control = NULL)
+	protected function getControl()
 	{
 		switch ($this->submitted) {
 			case $this['action']['delete']:
-				$control = $this->getPresenter();
-				break;
+				return $this->getPresenter();
 		}
 
-		return parent::flashMessage($message, $type, $control);
+		return parent::getControl();
 	}
 
 	/**
