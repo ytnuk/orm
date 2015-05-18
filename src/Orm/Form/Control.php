@@ -44,9 +44,14 @@ abstract class Control extends Ytnuk\Form\Control
 		};
 		$form->onSuccess[] = function (Ytnuk\Orm\Form $form) {
 			$presenter = $this->getPresenter();
-			switch ($form->submitted) {
+			switch ($form->isSubmitted()) {
 				case $form['action']['add']:
 					$presenter->redirect('Presenter:edit', $this->entity->id);
+					break;
+				case $form['action']['edit']:
+					if ( ! $this->presenter->isAjax()) {
+						$presenter->redirect('this');
+					}
 					break;
 				case $form['action']['delete']:
 					$presenter->redirect('Presenter:list');

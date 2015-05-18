@@ -19,8 +19,4 @@ form:
 				message: Deleting was successfull.
 			error:
 				warning: Deleting was unsuccessfull.
-		success:
-			message: Action was successfull.
-		warning:
-			message: Action was unsuccessfull.
 

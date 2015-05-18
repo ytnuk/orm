@@ -5,17 +5,17 @@ form:
 			label: Přidat
 			success:
 				message: Přidání proběhlo v pořádku.
-			warning:
+			error:
 				message: Při přidání nastala chyba.
 		edit:
 			label: Upravit
 			success:
 				message: Úprava proběhla v pořádku.
-			warning:
+			error:
 				message: Při úpravě nastala chyba.
 		delete:
 			label: Smazat
 			success:
 				message: Smazání proběhlo v pořádku.
-			warning:
+			error:
 				message: Při smazání nastala chyba.
