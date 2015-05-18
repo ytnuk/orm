@@ -313,7 +313,7 @@ abstract class Container extends Ytnuk\Form\Container
 		}, count($collection));
 		$container->addSubmit('add', $this->formatPropertyAction($property, 'add'))->setValidationScope(FALSE)->addCreateOnClick();
 
-		//TODO: fix rendering at end of form
+		//TODO: fix rendering at end of form + add groups relative to property->name from outside
 		return $container;
 	}
 
