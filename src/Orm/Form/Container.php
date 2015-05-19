@@ -165,7 +165,7 @@ abstract class Container extends Ytnuk\Form\Container
 					$path = $this->lookupPath(self::class, FALSE);
 					$delimiter = strpos($path, '-');
 					if (($delimiter === FALSE || $property->relationshipProperty === substr($path, 0, $delimiter)) && $property->relationshipRepository === get_class($container->getRepository())) {
-						$this->entity->setValue($property->name, $container->getEntity());
+						$this->entity->setReadOnlyValue($property->name, $container->getEntity());
 						continue;
 					}
 				}
