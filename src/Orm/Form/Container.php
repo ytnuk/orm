@@ -108,7 +108,14 @@ abstract class Container extends Ytnuk\Form\Container
 	public function removeComponent(Nette\ComponentModel\IComponent $component)
 	{
 		if ($component instanceof self) {
-			$this->getForm()->removeGroup($component->getCurrentGroup());
+			foreach ($component->getComponents(TRUE, self::class) as $container) {
+				if ($group = $container->getCurrentGroup()) {
+					$this->getForm()->removeGroup($group);
+				}
+			}
+			if ($group = $component->getCurrentGroup()) {
+				$this->getForm()->removeGroup($group);
+			}
 		}
 		parent::removeComponent($component);
 	}
@@ -172,27 +179,34 @@ abstract class Container extends Ytnuk\Form\Container
 	 */
 	protected function addProperty(Nextras\Orm\Entity\Reflection\PropertyMetadata $property)
 	{
-		if ( ! $input = $this->addPropertyInput($property, [$property->name => TRUE])) {
-			return;
+		$component = $this->addPropertyComponent($property);
+		switch (TRUE) {
+			case $component instanceof Nette\Forms\Controls\BaseControl:
+				$component->setRequired(! $property->isNullable);
+				$component->setDisabled($property->isReadonly);
+				$component->setDefaultValue($this->entity->getRawValue($property->name));
+				$component->setAttribute('placeholder', $this->formatPropertyPlaceholder($property));
+				break;
+			case $component instanceof Nette\ComponentModel\IContainer:
+				if ($property->isReadonly) {
+					foreach ($component->getComponents(TRUE, Nette\Forms\Controls\BaseControl::class) as $control) {
+						$value = $control->getValue();
+						$control->setDisabled();
+						$control->setDefaultValue($value);
+					}
+				}
+				break;
 		}
-		if ( ! $property->isNullable) {
-			$input->setRequired();
-		}
-		if ($this->entity->hasValue($property->name)) {
-			$input->setDefaultValue($this->entity->getRawValue($property->name));
-		}
-		$input->setAttribute('placeholder', $this->formatPropertyPlaceholder($property));
 	}
 
 	/**
 	 * @param Nextras\Orm\Entity\Reflection\PropertyMetadata $property
-	 * @param array $types
 	 *
-	 * @return \Nette\Forms\Controls\SelectBox|NULL
+	 * @return Nette\ComponentModel\IComponent
 	 */
-	protected function addPropertyInput(Nextras\Orm\Entity\Reflection\PropertyMetadata $property, $types = [])
+	protected function addPropertyComponent(Nextras\Orm\Entity\Reflection\PropertyMetadata $property)
 	{
-		foreach ($types + $property->types as $type => $value) {
+		foreach ([$property->name => TRUE] + $property->types + [substr($property->container, strrpos($property->container, '\\') + 1) => TRUE] as $type => $value) {
 			$method = 'addProperty' . ucfirst($type);
 			if ( ! method_exists($this, $method)) {
 				continue;
@@ -203,23 +217,32 @@ abstract class Container extends Ytnuk\Form\Container
 				$method
 			], $property);
 		}
-		if ( ! $property->container || ($property->container === Nextras\Orm\Relationships\OneHasMany::class && $property->relationshipRepository === $this->repository->getReflection()->getName())) {
-			return NULL;
-		}
-		switch ($property->container) {
-			case Nextras\Orm\Relationships\OneHasOneDirected::class:
-				$this->addPropertyOneHasOneDirected($property);
+	}
 
-				return NULL;
-			case Nextras\Orm\Relationships\ManyHasOne::class:
-				return $this->addPropertyManyHasOne($property);
-			case Nextras\Orm\Relationships\OneHasMany::class:
-				$this->addPropertyOneHasMany($property);
+	/**
+	 * @param Nextras\Orm\Entity\Reflection\PropertyMetadata $property
+	 *
+	 * @return string
+	 */
+	protected function formatPropertyPlaceholder(Nextras\Orm\Entity\Reflection\PropertyMetadata $property)
+	{
+		return implode('.', [
+			$this->prefixProperty($property),
+			'placeholder'
+		]);
+	}
 
-				return NULL;
-			default:
-				throw new Nextras\Orm\NotImplementedException;
-		}
+	/**
+	 * @param Nextras\Orm\Entity\Reflection\PropertyMetadata $property
+	 *
+	 * @return string
+	 */
+	protected function prefixProperty(Nextras\Orm\Entity\Reflection\PropertyMetadata $property)
+	{
+		return $this->prefix(implode('.', [
+			'entity',
+			$property->name
+		]));
 	}
 
 	/**
@@ -229,7 +252,7 @@ abstract class Container extends Ytnuk\Form\Container
 	 */
 	protected function addPropertyOneHasOneDirected(Nextras\Orm\Entity\Reflection\PropertyMetadata $property)
 	{
-		if ( ! $property->relationshipRepository || ! $property->relationshipIsMain) {
+		if ( ! $property->relationshipIsMain) {
 			return NULL;
 		}
 		if ($this->entity->hasValue($property->name)) {
@@ -271,19 +294,6 @@ abstract class Container extends Ytnuk\Form\Container
 			$this->prefixProperty($property),
 			'label'
 		]);
-	}
-
-	/**
-	 * @param Nextras\Orm\Entity\Reflection\PropertyMetadata $property
-	 *
-	 * @return string
-	 */
-	protected function prefixProperty(Nextras\Orm\Entity\Reflection\PropertyMetadata $property)
-	{
-		return $this->prefix(implode('.', [
-			'entity',
-			$property->name
-		]));
 	}
 
 	/**
@@ -353,19 +363,6 @@ abstract class Container extends Ytnuk\Form\Container
 		if ($flush) {
 			$this->repository->flush();
 		}
-	}
-
-	/**
-	 * @param Nextras\Orm\Entity\Reflection\PropertyMetadata $property
-	 *
-	 * @return string
-	 */
-	protected function formatPropertyPlaceholder(Nextras\Orm\Entity\Reflection\PropertyMetadata $property)
-	{
-		return implode('.', [
-			$this->prefixProperty($property),
-			'placeholder'
-		]);
 	}
 
 	/**
