@@ -79,7 +79,7 @@ abstract class Container extends Ytnuk\Form\Container
 	public function saveEntity($flush = TRUE)
 	{
 		$this->setValues($this->getValues());
-		$this->repository->persist($this->entity, TRUE);
+		$this->repository->persist($this->entity);
 		if ($flush) {
 			$this->repository->flush();
 		}
@@ -100,6 +100,17 @@ abstract class Container extends Ytnuk\Form\Container
 		}
 
 		return parent::setValues($values, $erase);
+	}
+
+	/**
+	 * @param Nette\ComponentModel\IComponent $component
+	 */
+	public function removeComponent(Nette\ComponentModel\IComponent $component)
+	{
+		if ($component instanceof self) {
+			$this->getForm()->removeGroup($component->getCurrentGroup());
+		}
+		parent::removeComponent($component);
 	}
 
 	/**
@@ -145,7 +156,8 @@ abstract class Container extends Ytnuk\Form\Container
 			if (is_subclass_of($property->container, Nextras\Orm\Relationships\HasOne::class)) {
 				if ($container = $this->lookup(self::class, FALSE)) {
 					$path = $this->lookupPath(self::class, FALSE);
-					if ($property->relationshipProperty === substr($path, 0, strpos($path, '-')) && $property->relationshipRepository === get_class($container->getRepository())) {
+					$delimiter = strpos($path, '-');
+					if (($delimiter === FALSE || $property->relationshipProperty === substr($path, 0, $delimiter)) && $property->relationshipRepository === get_class($container->getRepository())) {
 						$this->entity->setValue($property->name, $container->getEntity());
 						continue;
 					}
