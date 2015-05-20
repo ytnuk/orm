@@ -176,6 +176,8 @@ abstract class Container extends Ytnuk\Form\Container
 
 	/**
 	 * @param Nextras\Orm\Entity\Reflection\PropertyMetadata $property
+	 *
+	 * @return Nette\ComponentModel\IComponent
 	 */
 	protected function addProperty(Nextras\Orm\Entity\Reflection\PropertyMetadata $property)
 	{
@@ -197,6 +199,8 @@ abstract class Container extends Ytnuk\Form\Container
 				}
 				break;
 		}
+
+		return $component;
 	}
 
 	/**
@@ -318,7 +322,7 @@ abstract class Container extends Ytnuk\Form\Container
 	{
 		$repository = $this->model->getRepository($property->relationshipRepository);
 		$collection = $this->entity->getValue($property->name)->getIterator();
-		$container = $this->addDynamic($property->name, function (Nette\Forms\Container $container) use ($property, $repository, $collection) {
+		$replicator = $this->addDynamic($property->name, function (Nette\Forms\Container $container) use ($property, $repository, $collection) {
 			if ($entity = $collection->current()) {
 				$collection->next();
 			} else {
@@ -333,10 +337,26 @@ abstract class Container extends Ytnuk\Form\Container
 				$container->removeEntity();
 			});
 		}, count($collection));
-		$container->addSubmit('add', $this->formatPropertyAction($property, 'add'))->setValidationScope(FALSE)->addCreateOnClick();
+		$replicator->getCurrentGroup()->add($replicator->addSubmit('add', $this->formatPropertyAction($property, 'add'))->setValidationScope([$replicator])->addCreateOnClick());
+		$containers = [];
+		foreach ($replicator->getContainers() as $container) {
+			$containers[$container->name] = $container;
+		}
+		if ($this->getForm()->isSubmitted() instanceof Nette\Forms\Controls\SubmitButton) {
+			unset($containers[$this->getForm()->isSubmitted()->getParent()->getName()]);
+		}
+		foreach ($containers as $key => $container) {
+			foreach ($container->getComponents(FALSE, Nette\Forms\Controls\BaseControl::class) as $control) {
+				if ($control->getOption('unique')) {
+					foreach (array_diff_key($containers, [$key => $container]) as $sibling) {
+						$control->addRule(Nette\Forms\Form::NOT_EQUAL, NULL, $sibling[$control->name]);
+					}
+				}
+			}
+		}
 
 		//TODO: fix rendering at end of form + add groups relative to property->name from outside
-		return $container;
+		return $replicator;
 	}
 
 	/**
