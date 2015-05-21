@@ -126,16 +126,8 @@ abstract class Container extends Ytnuk\Form\Container
 	protected function attached($form)
 	{
 		parent::attached($form);
-		$this->setCurrentGroup($this->getForm()->addGroup($this->formatGroupCaption()));
+		$this->setCurrentGroup($this->getForm()->addGroup($this->prefix('group')));
 		$this->addProperties($this->metadata->getProperties());
-	}
-
-	/**
-	 * @return string
-	 */
-	protected function formatGroupCaption()
-	{
-		return $this->prefix('form.container.group');
 	}
 
 	/**
@@ -147,6 +139,8 @@ abstract class Container extends Ytnuk\Form\Container
 	{
 		return implode('.', [
 			str_replace('_', '.', $this->mapper->getTableName()),
+			'form',
+			'container',
 			$string
 		]);
 	}
@@ -156,6 +150,9 @@ abstract class Container extends Ytnuk\Form\Container
 	 */
 	protected function addProperties(array $properties)
 	{
+		//		usort($properties, function(Nextras\Orm\Entity\Reflection\PropertyMetadata $a, Nextras\Orm\Entity\Reflection\PropertyMetadata $b){
+		//			return is_subclass_of($a->container, Nextras\Orm\Relationships\HasMany::class) && ! is_subclass_of($b->container, Nextras\Orm\Relationships\HasMany::class);
+		//		});
 		foreach ($properties as $property) {
 			if (in_array($property->name, $this->metadata->getPrimaryKey()) || $property->isVirtual) {
 				continue;
@@ -244,7 +241,7 @@ abstract class Container extends Ytnuk\Form\Container
 	protected function prefixProperty(Nextras\Orm\Entity\Reflection\PropertyMetadata $property)
 	{
 		return $this->prefix(implode('.', [
-			'entity',
+			'property',
 			$property->name
 		]));
 	}
@@ -320,6 +317,7 @@ abstract class Container extends Ytnuk\Form\Container
 	 */
 	protected function addPropertyOneHasMany(Nextras\Orm\Entity\Reflection\PropertyMetadata $property)
 	{
+		$this->setCurrentGroup($this->getForm()->addGroup($this->prefixPropertyGroup($property), FALSE));
 		$repository = $this->model->getRepository($property->relationshipRepository);
 		$collection = $this->entity->getValue($property->name)->getIterator();
 		$replicator = $this->addDynamic($property->name, function (Nette\Forms\Container $container) use ($property, $repository, $collection) {
@@ -357,6 +355,19 @@ abstract class Container extends Ytnuk\Form\Container
 
 		//TODO: fix rendering at end of form + add groups relative to property->name from outside
 		return $replicator;
+	}
+
+	/**
+	 * @param Nextras\Orm\Entity\Reflection\PropertyMetadata $property
+	 *
+	 * @return string
+	 */
+	protected function prefixPropertyGroup(Nextras\Orm\Entity\Reflection\PropertyMetadata $property)
+	{
+		return implode('.', [
+			$this->prefixProperty($property),
+			'group'
+		]);
 	}
 
 	/**
