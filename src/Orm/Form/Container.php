@@ -107,17 +107,17 @@ abstract class Container extends Ytnuk\Form\Container
 	 */
 	public function removeComponent(Nette\ComponentModel\IComponent $component)
 	{
-		if ($component instanceof self) {
-			foreach ($component->getComponents(TRUE, self::class) as $container) {
-				if ($group = $container->getCurrentGroup()) {
-					$this->getForm()->removeGroup($group);
+		parent::removeComponent($component);
+		if ($component instanceof Nette\ComponentModel\Component && $form = $this->getForm(FALSE)) {
+			foreach ($form->getGroups() as $group) {
+				$controls = array_filter($group->getControls(), function (Nette\ComponentModel\Component $component) {
+					return $component->lookup(Nette\Forms\Form::class, FALSE);
+				});
+				if ( ! $controls) {
+					$form->removeGroup($group);
 				}
 			}
-			if ($group = $component->getCurrentGroup()) {
-				$this->getForm()->removeGroup($group);
-			}
 		}
-		parent::removeComponent($component);
 	}
 
 	/**
@@ -150,9 +150,6 @@ abstract class Container extends Ytnuk\Form\Container
 	 */
 	protected function addProperties(array $properties)
 	{
-		//		usort($properties, function(Nextras\Orm\Entity\Reflection\PropertyMetadata $a, Nextras\Orm\Entity\Reflection\PropertyMetadata $b){
-		//			return is_subclass_of($a->container, Nextras\Orm\Relationships\HasMany::class) && ! is_subclass_of($b->container, Nextras\Orm\Relationships\HasMany::class);
-		//		});
 		foreach ($properties as $property) {
 			if (in_array($property->name, $this->metadata->getPrimaryKey()) || $property->isVirtual) {
 				continue;
