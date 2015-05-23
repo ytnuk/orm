@@ -22,7 +22,7 @@ final class Extension extends Nextras\Orm\Bridges\NetteDI\OrmExtension implement
 	];
 
 	/**
-	 * @return array
+	 * @inheritdoc
 	 */
 	public function getConfigResources()
 	{
@@ -46,9 +46,7 @@ final class Extension extends Nextras\Orm\Bridges\NetteDI\OrmExtension implement
 	}
 
 	/**
-	 * @param string $model
-	 *
-	 * @return array
+	 * @inheritdoc
 	 */
 	protected function getRepositoryList($model)
 	{

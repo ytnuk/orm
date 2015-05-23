@@ -21,24 +21,24 @@ abstract class Container extends Ytnuk\Form\Container
 	protected $entity;
 
 	/**
-	 * @var Nextras\Orm\Entity\Reflection\EntityMetadata
-	 */
-	protected $metadata;
-
-	/**
 	 * @var Ytnuk\Orm\Repository
 	 */
 	protected $repository;
 
 	/**
+	 * @var Nextras\Orm\Entity\Reflection\EntityMetadata
+	 */
+	private $metadata;
+
+	/**
 	 * @var Ytnuk\Orm\Mapper
 	 */
-	protected $mapper;
+	private $mapper;
 
 	/**
 	 * @var Ytnuk\Orm\Model
 	 */
-	protected $model;
+	private $model;
 
 	/**
 	 * @param Ytnuk\Orm\Entity $entity
@@ -86,10 +86,7 @@ abstract class Container extends Ytnuk\Form\Container
 	}
 
 	/**
-	 * @param array|\Traversable $values
-	 * @param bool $erase
-	 *
-	 * @return Nette\Forms\Container
+	 * @inheritdoc
 	 */
 	public function setValues($values, $erase = FALSE)
 	{
@@ -103,7 +100,7 @@ abstract class Container extends Ytnuk\Form\Container
 	}
 
 	/**
-	 * @param Nette\ComponentModel\IComponent $component
+	 * @inheritdoc
 	 */
 	public function removeComponent(Nette\ComponentModel\IComponent $component)
 	{
@@ -121,7 +118,7 @@ abstract class Container extends Ytnuk\Form\Container
 	}
 
 	/**
-	 * @param Ytnuk\Form $form
+	 * @inheritdoc
 	 */
 	protected function attached($form)
 	{
@@ -215,6 +212,8 @@ abstract class Container extends Ytnuk\Form\Container
 				$method
 			], $property);
 		}
+
+		return NULL;
 	}
 
 	/**
@@ -277,6 +276,13 @@ abstract class Container extends Ytnuk\Form\Container
 		$primaryKeys = $entity->getMetadata()->getPrimaryKey();
 		$primaryKey = reset($primaryKeys);
 		$items = $repository->findAll()->fetchPairs($primaryKey, $entity::PROPERTY_NAME);
+		if ($container = $this->lookup(self::class, FALSE)) {
+			if ($container->getRepository() === $repository && $entity = $container->getEntity()) {
+				if ($entity->id) {
+					unset($items[$entity->id]);
+				}
+			}
+		}
 
 		return $this->addSelect($property->name, $this->formatPropertyLabel($property), $items)->setPrompt($this->formatPropertyPrompt($property));
 	}
@@ -332,13 +338,25 @@ abstract class Container extends Ytnuk\Form\Container
 				$container->removeEntity();
 			});
 		}, count($collection));
-		$replicator->getCurrentGroup()->add($replicator->addSubmit('add', $this->formatPropertyAction($property, 'add'))->setValidationScope([$replicator])->addCreateOnClick());
+		$replicator->getCurrentGroup()->add($add = $replicator->addSubmit('add', $this->formatPropertyAction($property, 'add'))->setValidationScope([$replicator])->addCreateOnClick());
+		if ($this->getForm()->isSubmitted() === $add) {
+			$isValid = TRUE;
+			if ($scope = $add->getValidationScope()) {
+				$isValid = ! array_filter($scope, function (Nette\Forms\Container $container) {
+					return ! $container->isValid();
+				});
+			}
+			if ($isValid) {
+				$add->setValidationScope(FALSE);
+			}
+			$add->click();
+			$add->onClick = [];
+		}
 		$containers = [];
 		foreach ($replicator->getContainers() as $container) {
-			$containers[$container->name] = $container;
-		}
-		if ($this->getForm()->isSubmitted() instanceof Nette\Forms\Controls\SubmitButton) {
-			unset($containers[$this->getForm()->isSubmitted()->getParent()->getName()]);
+			if ($this->getForm()->isSubmitted() !== $container['delete']) {
+				$containers[$container->name] = $container;
+			}
 		}
 		foreach ($containers as $key => $container) {
 			foreach ($container->getComponents(FALSE, Nette\Forms\Controls\BaseControl::class) as $control) {
@@ -350,7 +368,6 @@ abstract class Container extends Ytnuk\Form\Container
 			}
 		}
 
-		//TODO: fix rendering at end of form + add groups relative to property->name from outside
 		return $replicator;
 	}
 

@@ -13,7 +13,7 @@ abstract class Repository extends Nextras\Orm\Repository\Repository
 {
 
 	/**
-	 * @return array
+	 * @inheritdoc
 	 */
 	public static function getEntityClassNames()
 	{

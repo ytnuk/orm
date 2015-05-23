@@ -13,7 +13,7 @@ abstract class Mapper extends Nextras\Orm\Mapper\Mapper
 {
 
 	/**
-	 * @return string
+	 * @inheritdoc
 	 */
 	public function getTableName()
 	{

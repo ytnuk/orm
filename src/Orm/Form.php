@@ -62,7 +62,7 @@ final class Form extends Ytnuk\Form
 	}
 
 	/**
-	 * @return Nette\Application\UI\Control
+	 * @inheritdoc
 	 */
 	protected function getControl()
 	{
@@ -75,9 +75,7 @@ final class Form extends Ytnuk\Form
 	}
 
 	/**
-	 * @param string $type
-	 *
-	 * @return string
+	 * @inheritdoc
 	 */
 	protected function formatFlashMessage($type)
 	{
@@ -92,7 +90,7 @@ final class Form extends Ytnuk\Form
 	}
 
 	/**
-	 * @param $control
+	 * @inheritdoc
 	 */
 	protected function attached($control)
 	{
@@ -106,9 +104,7 @@ final class Form extends Ytnuk\Form
 	}
 
 	/**
-	 * @param $name
-	 *
-	 * @return Nette\ComponentModel\IComponent
+	 * @inheritdoc
 	 */
 	protected function createComponent($name)
 	{
@@ -120,4 +116,16 @@ final class Form extends Ytnuk\Form
 
 		return parent::createComponent($name);
 	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function addGroup($caption = NULL, $setAsCurrent = TRUE)
+	{
+		$group = parent::addGroup(NULL, $setAsCurrent);
+		$group->setOption('label', $caption);
+
+		return $group;
+	}
+
 }
