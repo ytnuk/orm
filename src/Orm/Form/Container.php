@@ -41,6 +41,11 @@ abstract class Container extends Ytnuk\Form\Container
 	private $model;
 
 	/**
+	 * @var Ytnuk\Orm\Entity[]
+	 */
+	private $relations = [];
+
+	/**
 	 * @param Ytnuk\Orm\Entity $entity
 	 * @param Ytnuk\Orm\Repository $repository
 	 */
@@ -52,9 +57,7 @@ abstract class Container extends Ytnuk\Form\Container
 		$this->mapper = $repository->getMapper();
 		$this->model = $repository->getModel();
 		$this->monitor(Ytnuk\Orm\Form::class);
-		if ( ! $entity->isAttached()) {
-			$repository->attach($entity);
-		}
+		$repository->attach($entity);
 	}
 
 	/**
@@ -74,9 +77,17 @@ abstract class Container extends Ytnuk\Form\Container
 	}
 
 	/**
+	 * @return Nextras\Orm\Entity\Reflection\EntityMetadata
+	 */
+	public function getMetadata()
+	{
+		return $this->metadata;
+	}
+
+	/**
 	 * @param bool $flush
 	 */
-	public function saveEntity($flush = TRUE)
+	public function persistEntity($flush = TRUE)
 	{
 		$this->setValues($this->getValues());
 		$this->repository->persist($this->entity);
@@ -90,6 +101,7 @@ abstract class Container extends Ytnuk\Form\Container
 	 */
 	public function setValues($values, $erase = FALSE)
 	{
+		$this->initEntityRelations();
 		foreach ($values as $property => $value) {
 			if ($this[$property] instanceof Nette\Forms\IControl) {
 				$this->entity->setValue($property, $value === '' ? NULL : $value);
@@ -100,20 +112,25 @@ abstract class Container extends Ytnuk\Form\Container
 	}
 
 	/**
+	 * @return Ytnuk\Orm\Entity[]
+	 */
+	public function initEntityRelations()
+	{
+		foreach ($this->relations as $property => $value) {
+			$this->entity->setValue($property, $value);
+		}
+
+		return $this->relations;
+	}
+
+	/**
 	 * @inheritdoc
 	 */
 	public function removeComponent(Nette\ComponentModel\IComponent $component)
 	{
 		parent::removeComponent($component);
-		if ($component instanceof Nette\ComponentModel\Component && $form = $this->getForm(FALSE)) {
-			foreach ($form->getGroups() as $group) {
-				$controls = array_filter($group->getControls(), function (Nette\ComponentModel\Component $component) {
-					return $component->lookup(Nette\Forms\Form::class, FALSE);
-				});
-				if ( ! $controls) {
-					$form->removeGroup($group);
-				}
-			}
+		if ($component instanceof self) {
+			$component->initEntityRelations();
 		}
 	}
 
@@ -123,8 +140,22 @@ abstract class Container extends Ytnuk\Form\Container
 	protected function attached($form)
 	{
 		parent::attached($form);
-		$this->setCurrentGroup($this->getForm()->addGroup($this->prefix('group')));
+		$this->setCurrentGroup($this->getForm()->addGroup($this->prefixContainer('group')));
 		$this->addProperties($this->metadata->getProperties());
+	}
+
+	/**
+	 * @param string $string
+	 *
+	 * @return string
+	 */
+	protected function prefixContainer($string)
+	{
+		return $this->prefix(implode('.', [
+			'form',
+			'container',
+			$string
+		]));
 	}
 
 	/**
@@ -136,8 +167,6 @@ abstract class Container extends Ytnuk\Form\Container
 	{
 		return implode('.', [
 			str_replace('_', '.', $this->mapper->getTableName()),
-			'form',
-			'container',
 			$string
 		]);
 	}
@@ -156,7 +185,7 @@ abstract class Container extends Ytnuk\Form\Container
 					$path = $this->lookupPath(self::class, FALSE);
 					$delimiter = strpos($path, '-');
 					if (($delimiter === FALSE || $property->relationshipProperty === substr($path, 0, $delimiter)) && $property->relationshipRepository === get_class($container->getRepository())) {
-						$this->entity->setReadOnlyValue($property->name, $container->getEntity());
+						$this->relations[$property->name] = $container->getEntity();
 						continue;
 					}
 				}
@@ -236,7 +265,7 @@ abstract class Container extends Ytnuk\Form\Container
 	 */
 	protected function prefixProperty(Nextras\Orm\Entity\Reflection\PropertyMetadata $property)
 	{
-		return $this->prefix(implode('.', [
+		return $this->prefixContainer(implode('.', [
 			'property',
 			$property->name
 		]));
@@ -316,7 +345,7 @@ abstract class Container extends Ytnuk\Form\Container
 	/**
 	 * @param Nextras\Orm\Entity\Reflection\PropertyMetadata $property
 	 *
-	 * @return \Nette\Forms\Container|NULL
+	 * @return Kdyby\Replicator\Container
 	 */
 	protected function addPropertyOneHasMany(Nextras\Orm\Entity\Reflection\PropertyMetadata $property)
 	{

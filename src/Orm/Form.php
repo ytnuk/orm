@@ -53,7 +53,7 @@ final class Form extends Ytnuk\Form
 		switch ($form->isSubmitted()) {
 			case $this['action']['add']:
 			case $this['action']['edit']:
-				$container->saveEntity();
+				$container->persistEntity();
 				break;
 			case $this['action']['delete']:
 				$container->removeEntity();
@@ -101,6 +101,23 @@ final class Form extends Ytnuk\Form
 		$action->addSubmit('add', 'orm.form.action.add.label')->setDisabled($this->entity->isPersisted());
 		$action->addSubmit('edit', 'orm.form.action.edit.label')->setDisabled(! $this->entity->isPersisted());
 		$action->addSubmit('delete', 'orm.form.action.delete.label')->setValidationScope(FALSE)->setDisabled(! $this->entity->isPersisted());
+		$controlGroupReflection = Nette\Reflection\ClassType::from('Nette\Forms\ControlGroup');
+		$controlsProperty = $controlGroupReflection->getProperty('controls');
+		$controlsProperty->setAccessible(TRUE);
+		do {
+			$detached = FALSE;
+			foreach ($this->getGroups() as $group) {
+				foreach ($controls = $controlsProperty->getValue($group) as $control) {
+					if ( ! $control->lookup(Nette\Forms\Form::class, FALSE)) {
+						$detached = TRUE;
+						$controls->detach($control);
+					}
+				}
+				if ( ! count($controls)) {
+					$this->removeGroup($group);
+				}
+			}
+		} while ($detached);
 	}
 
 	/**
