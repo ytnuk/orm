@@ -21,7 +21,7 @@ final class Model extends Nextras\Orm\Model\Model
 	{
 		parent::__construct($configuration, $repositoryLoader, $metadataStorage);
 		$this->onFlush[] = function ($persisted, $removed) use ($storage) {
-			array_map(function (Nextras\Orm\Entity\IEntity $entity) use ($storage) {
+			array_map(function (Nextras\Orm\Entity\IEntity $entity = NULL) use ($storage) {
 				if ($entity instanceof Ytnuk\Cache\Provider) {
 					$storage->remove($entity->getCacheKey());
 					$storage->clean([
