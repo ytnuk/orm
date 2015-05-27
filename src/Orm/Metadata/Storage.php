@@ -16,7 +16,7 @@ final class Storage extends Nextras\Orm\Model\MetadataStorage
 	/**
 	 * @inheritDoc
 	 */
-	protected static $metadata;
+	private static $metadata;
 
 	/**
 	 * @var array
@@ -44,7 +44,6 @@ final class Storage extends Nextras\Orm\Model\MetadataStorage
 			return $metadata;
 		});
 		new Nextras\Orm\Model\MetadataStorage($cacheStorage, $entityClasses, $repositoryLoader);
-		parent::__construct($cacheStorage, $entityClasses, $repositoryLoader);
 	}
 
 	/**
