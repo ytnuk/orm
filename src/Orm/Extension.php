@@ -54,4 +54,16 @@ final class Extension extends Nextras\Orm\Bridges\NetteDI\OrmExtension implement
 
 		return parent::getRepositoryList($model) + $config['repositories'];
 	}
+
+	/**
+	 * @inheritdoc
+	 */
+	protected function setupMetadataStorage(array $repositoryConfig)
+	{
+		parent::setupMetadataStorage($repositoryConfig);
+		$storage = $this->getContainerBuilder()->getDefinition($this->prefix('metadataStorage'));
+		$storage->setClass(Metadata\Storage::class);
+		$storage->getFactory()->setEntity($storage->getClass());
+		$storage->getFactory()->arguments['repositories'] = $repositoryConfig[2];
+	}
 }
