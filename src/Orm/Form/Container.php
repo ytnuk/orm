@@ -344,15 +344,16 @@ abstract class Container extends Ytnuk\Form\Container
 
 	/**
 	 * @param Nextras\Orm\Entity\Reflection\PropertyMetadata $property
+	 * @param int $forceDefault
 	 *
 	 * @return Kdyby\Replicator\Container
 	 */
-	protected function addPropertyOneHasMany(Nextras\Orm\Entity\Reflection\PropertyMetadata $property)
+	protected function addPropertyOneHasMany(Nextras\Orm\Entity\Reflection\PropertyMetadata $property, $forceDefault = 0)
 	{
 		$this->setCurrentGroup($this->getForm()->addGroup($this->prefixPropertyGroup($property), FALSE));
 		$repository = $this->model->getRepository($property->relationshipRepository);
 		$collection = $this->entity->getValue($property->name)->getIterator();
-		$replicator = $this->addDynamic($property->name, function (Nette\Forms\Container $container) use ($property, $repository, $collection) {
+		$replicator = $this->addDynamic($property->name, function (Nette\Forms\Container $container) use ($property, $repository, $collection, & $forceDefault) {
 			if ($entity = $collection->current()) {
 				$collection->next();
 			} else {
@@ -363,10 +364,12 @@ abstract class Container extends Ytnuk\Form\Container
 			$name = $container->getName();
 			unset($container->parent[$name]);
 			$replicator->addComponent($container = $this->form->createComponent($entity), $name);
-			$container->addSubmit('delete', $this->formatPropertyAction($property, 'delete'))->addRemoveOnClick(function (Kdyby\Replicator\Container $replicator, self $container) {
-				$container->removeEntity();
-			});
-		}, count($collection));
+			if ($entity->isPersisted() || ! $forceDefault--) {
+				$container->addSubmit('delete', $this->formatPropertyAction($property, 'delete'))->addRemoveOnClick(function (Kdyby\Replicator\Container $replicator, self $container) {
+					$container->removeEntity();
+				});
+			}
+		}, max(count($collection), $forceDefault), (bool) $forceDefault);
 		$replicator->getCurrentGroup()->add($add = $replicator->addSubmit('add', $this->formatPropertyAction($property, 'add'))->setValidationScope([$replicator])->addCreateOnClick());
 		if ($this->getForm()->isSubmitted() === $add) {
 			$isValid = TRUE;
@@ -383,7 +386,7 @@ abstract class Container extends Ytnuk\Form\Container
 		}
 		$containers = [];
 		foreach ($replicator->getContainers() as $container) {
-			if ($this->getForm()->isSubmitted() !== $container['delete']) {
+			if ( ! isset($container['delete']) || $this->getForm()->isSubmitted() !== $container['delete']) {
 				$containers[$container->name] = $container;
 			}
 		}
