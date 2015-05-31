@@ -353,7 +353,7 @@ abstract class Container extends Ytnuk\Form\Container
 		$this->setCurrentGroup($this->getForm()->addGroup($this->prefixPropertyGroup($property), FALSE));
 		$repository = $this->model->getRepository($property->relationshipRepository);
 		$collection = $this->entity->getValue($property->name)->getIterator();
-		$replicator = $this->addDynamic($property->name, function (Nette\Forms\Container $container) use ($property, $repository, $collection, & $forceDefault) {
+		$replicator = $this->addDynamic($property->name, function (Nette\Forms\Container $container) use ($property, $repository, $collection) {
 			if ($entity = $collection->current()) {
 				$collection->next();
 			} else {
@@ -364,11 +364,9 @@ abstract class Container extends Ytnuk\Form\Container
 			$name = $container->getName();
 			unset($container->parent[$name]);
 			$replicator->addComponent($container = $this->form->createComponent($entity), $name);
-			if ($entity->isPersisted() || ! $forceDefault--) {
-				$container->addSubmit('delete', $this->formatPropertyAction($property, 'delete'))->addRemoveOnClick(function (Kdyby\Replicator\Container $replicator, self $container) {
-					$container->removeEntity();
-				});
-			}
+			$container->addSubmit('delete', $this->formatPropertyAction($property, 'delete'))->addRemoveOnClick(function (Kdyby\Replicator\Container $replicator, self $container) {
+				$container->removeEntity();
+			});
 		}, max(count($collection), $forceDefault), (bool) $forceDefault);
 		$replicator->getCurrentGroup()->add($add = $replicator->addSubmit('add', $this->formatPropertyAction($property, 'add'))->setValidationScope([$replicator])->addCreateOnClick());
 		if ($this->getForm()->isSubmitted() === $add) {
@@ -388,6 +386,20 @@ abstract class Container extends Ytnuk\Form\Container
 		foreach ($replicator->getContainers() as $container) {
 			if ( ! isset($container['delete']) || $this->getForm()->isSubmitted() !== $container['delete']) {
 				$containers[$container->name] = $container;
+			}
+		}
+		if (count($containers) <= $forceDefault) {
+			array_map(function (self $container) {
+				unset($container['delete']);
+			}, $containers);
+		} else {
+			$persistedContainers = array_filter($containers, function (self $container) {
+				return $container->getEntity()->isPersisted();
+			});
+			if (count($persistedContainers) <= $forceDefault) {
+				array_map(function (self $container) {
+					unset($container['delete']);
+				}, $persistedContainers);
 			}
 		}
 		foreach ($containers as $key => $container) {
