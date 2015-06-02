@@ -18,12 +18,12 @@ abstract class Container extends Ytnuk\Form\Container
 	/**
 	 * @var Ytnuk\Orm\Entity
 	 */
-	protected $entity;
+	private $entity;
 
 	/**
 	 * @var Ytnuk\Orm\Repository
 	 */
-	protected $repository;
+	private $repository;
 
 	/**
 	 * @var Nextras\Orm\Entity\Reflection\EntityMetadata
@@ -177,7 +177,7 @@ abstract class Container extends Ytnuk\Form\Container
 	protected function addProperties(array $properties)
 	{
 		foreach ($properties as $property) {
-			if (in_array($property->name, $this->metadata->getPrimaryKey()) || $property->isVirtual) {
+			if (in_array($property->name, $this->metadata->getPrimaryKey())) {
 				continue;
 			}
 			if (is_subclass_of($property->container, Nextras\Orm\Relationships\HasOne::class)) {
@@ -230,7 +230,7 @@ abstract class Container extends Ytnuk\Form\Container
 	 */
 	protected function addPropertyComponent(Nextras\Orm\Entity\Reflection\PropertyMetadata $property)
 	{
-		foreach ([$property->name => TRUE] + $property->types + [substr($property->container, strrpos($property->container, '\\') + 1) => TRUE] as $type => $value) {
+		foreach ([$property->name => TRUE] + ($property->isVirtual ? [] : $property->types + [substr($property->container, strrpos($property->container, '\\') + 1) => TRUE]) as $type => $value) {
 			$method = 'addProperty' . ucfirst($type);
 			if ( ! method_exists($this, $method)) {
 				continue;
@@ -406,7 +406,7 @@ abstract class Container extends Ytnuk\Form\Container
 			foreach ($container->getComponents(FALSE, Nette\Forms\Controls\BaseControl::class) as $control) {
 				if ($control->getOption('unique')) {
 					foreach (array_diff_key($containers, [$key => $container]) as $sibling) {
-						$control->addRule(Nette\Forms\Form::NOT_EQUAL, NULL, $sibling[$control->name]);
+						$control->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NOT_EQUAL, NULL, $sibling[$control->name]);
 					}
 				}
 			}

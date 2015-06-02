@@ -27,10 +27,12 @@ abstract class Repository extends Nextras\Orm\Repository\Repository
 	 */
 	public function remove($entity, $recursive = FALSE)
 	{
-		foreach ($entity->getMetadata()->getProperties() as $property) {
-			if ($property->relationshipIsMain && $property->relationshipType === Nextras\Orm\Entity\Reflection\PropertyMetadata::RELATIONSHIP_ONE_HAS_ONE_DIRECTED) {
-				if ($relationEntity = $entity->getValue($property->name)) {
-					$relationEntity->getRepository()->remove($relationEntity, $recursive);
+		if ($recursive) {
+			foreach ($entity->getMetadata()->getProperties() as $property) {
+				if ($property->relationshipIsMain && $property->relationshipType === Nextras\Orm\Entity\Reflection\PropertyMetadata::RELATIONSHIP_ONE_HAS_ONE_DIRECTED) {
+					if ($relationEntity = $entity->getValue($property->name)) {
+						$relationEntity->getRepository()->remove($relationEntity, $recursive);
+					}
 				}
 			}
 		}
