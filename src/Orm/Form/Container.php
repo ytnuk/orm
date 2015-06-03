@@ -404,9 +404,13 @@ abstract class Container extends Ytnuk\Form\Container
 		}
 		foreach ($containers as $key => $container) {
 			foreach ($container->getComponents(FALSE, Nette\Forms\Controls\BaseControl::class) as $control) {
-				if ($control->getOption('unique')) {
+				if ($unique = $control->getOption('unique')) {
 					foreach (array_diff_key($containers, [$key => $container]) as $sibling) {
-						$control->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NOT_EQUAL, NULL, $sibling[$control->name]);
+						$condition = $control->addCondition(Nette\Forms\Form::FILLED);
+						if (is_string($unique) && isset($container[$unique]) && isset($sibling[$unique])) {
+							$condition = $condition->addConditionOn($container[$unique], Nette\Forms\Form::EQUAL, $sibling[$unique]);
+						}
+						$condition->addRule(Nette\Forms\Form::NOT_EQUAL, NULL, $sibling[$control->name]);
 					}
 				}
 			}
