@@ -20,12 +20,11 @@ abstract class Entity extends Nextras\Orm\Entity\Entity implements Ytnuk\Cache\P
 	 */
 	public function __toString()
 	{
-		$property = self::PROPERTY_NAME;
-		if ($this->hasValue(static::PROPERTY_NAME)) {
-			$property = static::PROPERTY_NAME;
+		if ( ! $value = $this->getValue(static::PROPERTY_NAME)) {
+			$value = $this->getValue(self::PROPERTY_NAME);
 		}
 
-		return (string) $this->getValue($property);
+		return (string) $value;
 	}
 
 	/**
