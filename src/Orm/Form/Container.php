@@ -300,11 +300,7 @@ abstract class Container extends Ytnuk\Form\Container
 	protected function addPropertyManyHasOne(Nextras\Orm\Entity\Reflection\PropertyMetadata $property)
 	{
 		$repository = $this->model->getRepository($property->relationshipRepository);
-		$class = $repository->getEntityClassName([]);
-		$entity = new $class;
-		$primaryKeys = $entity->getMetadata()->getPrimaryKey();
-		$primaryKey = reset($primaryKeys);
-		$items = $repository->findAll()->fetchPairs($primaryKey, $entity::PROPERTY_NAME);
+		$items = $repository->findAll()->fetchPairs(implode('-', $repository->getEntityMetadata()->getPrimaryKey()));
 		if ($container = $this->lookup(self::class, FALSE)) {
 			if ($container->getRepository() === $repository && $entity = $container->getEntity()) {
 				if ($entity->id) {
