@@ -204,7 +204,9 @@ abstract class Container extends Ytnuk\Form\Container
 		$component = $this->addPropertyComponent($property);
 		switch (TRUE) {
 			case $component instanceof Nette\Forms\Controls\BaseControl:
-				$component->setRequired(! $property->isNullable);
+				if ( ! $component instanceof Nette\Forms\Controls\Checkbox) {
+					$component->setRequired(! $property->isNullable);
+				}
 				$component->setDisabled($property->isReadonly);
 				$component->setDefaultValue($this->entity->getRawValue($property->name));
 				$component->setAttribute('placeholder', $this->formatPropertyPlaceholder($property));
@@ -380,7 +382,7 @@ abstract class Container extends Ytnuk\Form\Container
 		}
 		$containers = [];
 		foreach ($replicator->getContainers() as $container) {
-			if ( ! isset($container['delete']) || $this->getForm()->isSubmitted() !== $container['delete']) {
+			if ($this->getForm()->isSubmitted() !== $container['delete']) {
 				$containers[$container->name] = $container;
 			}
 		}
