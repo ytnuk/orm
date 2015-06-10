@@ -39,7 +39,11 @@ abstract class Entity extends Nextras\Orm\Entity\Entity implements Ytnuk\Cache\P
 		];
 		if ($invalidate) {
 			foreach ($this->getMetadata()->getProperties() as $property) {
-				if ( ! $property->relationshipIsMain && $property->relationshipType === Nextras\Orm\Entity\Reflection\PropertyMetadata::RELATIONSHIP_ONE_HAS_ONE_DIRECTED) {
+				$relations = [
+					Nextras\Orm\Entity\Reflection\PropertyMetadata::RELATIONSHIP_ONE_HAS_ONE_DIRECTED,
+					Nextras\Orm\Entity\Reflection\PropertyMetadata::RELATIONSHIP_MANY_HAS_ONE
+				];
+				if ( ! $property->relationshipIsMain && in_array($property->relationshipType, $relations)) {
 					if ($relationEntity = $this->getValue($property->name)) {
 						if ($relationEntity instanceof Ytnuk\Cache\Provider) {
 							$tags = array_merge($tags, $relationEntity->getCacheTags($invalidate));

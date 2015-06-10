@@ -180,14 +180,15 @@ abstract class Container extends Ytnuk\Form\Container
 			if (in_array($property->name, $this->metadata->getPrimaryKey())) {
 				continue;
 			}
-			if (is_subclass_of($property->container, Nextras\Orm\Relationships\HasOne::class)) {
-				if ($container = $this->lookup(self::class, FALSE)) {
-					$path = $this->lookupPath(self::class, FALSE);
-					$delimiter = strpos($path, '-');
-					if (($delimiter === FALSE || $property->relationshipProperty === substr($path, 0, $delimiter)) && $property->relationshipRepository === get_class($container->getRepository())) {
-						$this->relations[$property->name] = $container->getEntity();
-						continue;
-					}
+			if (is_subclass_of($property->container, Nextras\Orm\Relationships\HasOne::class) && $container = $this->lookup(self::class, FALSE)) {
+				$path = $this->lookupPath(self::class, FALSE);
+				$delimiter = strpos($path, '-');
+				if ($delimiter !== FALSE) {
+					$path = substr($path, 0, $delimiter);
+				}
+				if ($property->relationshipProperty === $path && $property->relationshipRepository === get_class($container->getRepository())) {
+					$this->relations[$property->name] = $container->getEntity();
+					continue;
 				}
 			}
 			$this->addProperty($property);

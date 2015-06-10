@@ -21,14 +21,20 @@ final class Model extends Nextras\Orm\Model\Model
 	{
 		parent::__construct($configuration, $repositoryLoader, $metadataStorage);
 		$this->onFlush[] = function ($persisted, $removed) use ($storage) {
-			array_map(function (Nextras\Orm\Entity\IEntity $entity = NULL) use ($storage) {
+			$tags = [];
+			$keys = [];
+			array_map(function (Nextras\Orm\Entity\IEntity $entity = NULL) use (& $tags, & $keys) {
 				if ($entity instanceof Ytnuk\Cache\Provider) {
-					$storage->remove($entity->getCacheKey());
-					$storage->clean([
-						Nette\Caching\Cache::TAGS => $entity->getCacheTags(TRUE)
-					]);
+					$tags += array_flip($entity->getCacheTags(TRUE));
+					$keys[$entity->getCacheKey()] = TRUE;
 				}
 			}, $persisted, $removed);
+			foreach (array_keys($keys) as $key) {
+				$storage->remove($key);
+			}
+			$storage->clean([
+				Nette\Caching\Cache::TAGS => array_keys($tags)
+			]);
 		};
 	}
 }
