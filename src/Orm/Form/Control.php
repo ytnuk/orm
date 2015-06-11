@@ -6,9 +6,9 @@ use Ytnuk;
 /**
  * Class Control
  *
- * @package Ytnuk\Orm\Form
+ * @package Ytnuk\Orm
  */
-abstract class Control extends Ytnuk\Form\Control
+abstract class Control extends Ytnuk\Orm\Control
 {
 
 	/**
@@ -27,6 +27,7 @@ abstract class Control extends Ytnuk\Form\Control
 	 */
 	public function __construct(Ytnuk\Orm\Entity $entity, Factory $form)
 	{
+		parent::__construct($entity);
 		$this->entity = $entity;
 		$this->form = $form;
 	}
@@ -34,7 +35,7 @@ abstract class Control extends Ytnuk\Form\Control
 	/**
 	 * @return Ytnuk\Orm\Form
 	 */
-	protected function createComponentYtnukForm()
+	protected function createComponentYtnukOrmForm()
 	{
 		$form = $this->form->create($this->entity);
 		$form->onSuccess[] = function (Ytnuk\Orm\Form $form) {
