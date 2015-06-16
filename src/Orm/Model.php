@@ -15,26 +15,45 @@ final class Model extends Nextras\Orm\Model\Model
 {
 
 	/**
+	 * @var array
+	 */
+	private $tags = [];
+
+	/**
+	 * @var array
+	 */
+	private $keys = [];
+
+	/**
+	 * @var Nette\Caching\IStorage
+	 */
+	private $cacheStorage;
+
+	/**
 	 * @inheritdoc
 	 */
-	public function __construct(array $configuration, Nextras\Orm\Model\IRepositoryLoader $repositoryLoader, Nextras\Orm\Model\MetadataStorage $metadataStorage, Nette\Caching\IStorage $storage)
+	public function __construct(array $configuration, Nextras\Orm\Model\IRepositoryLoader $repositoryLoader, Nextras\Orm\Model\MetadataStorage $metadataStorage, Nette\Caching\IStorage $cacheStorage)
 	{
 		parent::__construct($configuration, $repositoryLoader, $metadataStorage);
-		$this->onFlush[] = function ($persisted, $removed) use ($storage) {
-			$tags = [];
-			$keys = [];
-			array_map(function (Nextras\Orm\Entity\IEntity $entity = NULL) use (& $tags, & $keys) {
-				if ($entity instanceof Ytnuk\Cache\Provider) {
-					$tags += array_flip($entity->getCacheTags(TRUE));
-					$keys[$entity->getCacheKey()] = TRUE;
-				}
-			}, $persisted, $removed);
-			foreach (array_keys($keys) as $key) {
-				$storage->remove($key);
+		$this->cacheStorage = $cacheStorage;
+		$this->onFlush[] = function () {
+			foreach ($this->keys as $key => $value) {
+				$this->cacheStorage->remove($key);
 			}
-			$storage->clean([
-				Nette\Caching\Cache::TAGS => array_keys($tags)
+			$this->cacheStorage->clean([
+				Nette\Caching\Cache::TAGS => array_keys($this->tags)
 			]);
 		};
+	}
+
+	/**
+	 * @param Nextras\Orm\Entity\IEntity $entity
+	 */
+	public function processEntityCache(Nextras\Orm\Entity\IEntity $entity)
+	{
+		if ($entity instanceof Ytnuk\Cache\Provider) {
+			$this->tags += $entity->getCacheTags(TRUE);
+			$this->keys[$entity->getCacheKey()] = TRUE;
+		}
 	}
 }
