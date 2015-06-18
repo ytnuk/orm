@@ -20,11 +20,6 @@ final class Model extends Nextras\Orm\Model\Model
 	private $tags = [];
 
 	/**
-	 * @var array
-	 */
-	private $keys = [];
-
-	/**
 	 * @var Nette\Caching\IStorage
 	 */
 	private $cacheStorage;
@@ -37,9 +32,6 @@ final class Model extends Nextras\Orm\Model\Model
 		parent::__construct($configuration, $repositoryLoader, $metadataStorage);
 		$this->cacheStorage = $cacheStorage;
 		$this->onFlush[] = function () {
-			foreach ($this->keys as $key => $value) {
-				$this->cacheStorage->remove($key);
-			}
 			$this->cacheStorage->clean([
 				Nette\Caching\Cache::TAGS => array_keys($this->tags)
 			]);
@@ -53,7 +45,6 @@ final class Model extends Nextras\Orm\Model\Model
 	{
 		if ($entity instanceof Ytnuk\Cache\Provider) {
 			$this->tags += $entity->getCacheTags(TRUE);
-			$this->keys[$entity->getCacheKey()] = TRUE;
 		}
 	}
 }

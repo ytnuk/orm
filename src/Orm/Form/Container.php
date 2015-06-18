@@ -176,18 +176,19 @@ abstract class Container extends Ytnuk\Form\Container
 	 */
 	protected function addProperties(array $properties)
 	{
+		$path = $this->lookupPath(self::class, FALSE);
+		$delimiter = strpos($path, '-');
+		if ($delimiter !== FALSE) {
+			$path = substr($path, 0, $delimiter);
+		}
+		$parent = $this->lookup(self::class, FALSE);
 		foreach ($properties as $property) {
 			if (in_array($property->name, $this->metadata->getPrimaryKey())) {
 				continue;
 			}
-			if (is_subclass_of($property->container, Nextras\Orm\Relationships\HasOne::class) && $container = $this->lookup(self::class, FALSE)) {
-				$path = $this->lookupPath(self::class, FALSE);
-				$delimiter = strpos($path, '-');
-				if ($delimiter !== FALSE) {
-					$path = substr($path, 0, $delimiter);
-				}
-				if ($property->relationshipProperty === $path && $property->relationshipRepository === get_class($container->getRepository())) {
-					$this->relations[$property->name] = $container->getEntity();
+			if ($path && $parent && is_subclass_of($property->container, Nextras\Orm\Relationships\HasOne::class)) {
+				if ($property->relationshipProperty === $path && $property->relationshipRepository === get_class($parent->getRepository())) {
+					$this->relations[$property->name] = $parent->getEntity();
 					continue;
 				}
 			}
@@ -352,6 +353,11 @@ abstract class Container extends Ytnuk\Form\Container
 		$this->setCurrentGroup($this->getForm()->addGroup($this->prefixPropertyGroup($property), FALSE));
 		$repository = $this->model->getRepository($property->relationshipRepository);
 		$collection = $this->entity->getValue($property->name)->getIterator();
+		$parent = $this->lookup(Ytnuk\Orm\Form\Container::class, FALSE);
+		$isNullable = $parent && $parent->getMetadata()->getProperty($this->name)->isNullable;
+		if ($isNullable) {
+			$forceDefault = 0;
+		}
 		$replicator = $this->addDynamic($property->name, function (Nette\Forms\Container $container) use ($property, $repository, $collection) {
 			if ($entity = $collection->current()) {
 				$collection->next();
@@ -367,6 +373,14 @@ abstract class Container extends Ytnuk\Form\Container
 				$container->removeEntity();
 			});
 		}, max(count($collection), $forceDefault), (bool) $forceDefault);
+		if ($isNullable && $this->getForm()->isSubmitted()) {
+			$containers = array_filter($replicator->getContainers()->getArrayCopy(), function ($container) {
+				return $container instanceof self && ! $container['delete']->isSubmittedBy();
+			});
+			if ( ! $containers) {
+				$this->removeEntity();
+			}
+		}
 		$replicator->getCurrentGroup()->add($add = $replicator->addSubmit('add', $this->formatPropertyAction($property, 'add'))->setValidationScope([$replicator])->addCreateOnClick());
 		if ($this->getForm()->isSubmitted() === $add) {
 			$isValid = TRUE;

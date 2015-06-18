@@ -33,7 +33,7 @@ abstract class Control extends Ytnuk\Application\Control
 	protected function createComponentYtnukOrmPaginationControl()
 	{
 		return new Nette\Application\UI\Multiplier(function ($key) {
-			return new Ytnuk\Orm\Pagination\Control($this->entity->getValue($key));
+			return new Ytnuk\Orm\Pagination\Control($this->entity->getValue($key), $this->entity->itemsPerPage[$key]); //TODO: do not define in entity
 		});
 	}
 }

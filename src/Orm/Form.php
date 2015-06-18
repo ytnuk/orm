@@ -82,7 +82,7 @@ final class Form extends Ytnuk\Form
 		$message = [
 			parent::formatFlashMessage($type)
 		];
-		if ($this->submitted && $this->submitted->getParent() === $this['action']) {
+		if ($this->submitted instanceof Nette\Forms\Controls\Button && $this->submitted->getParent() === $this['action']) {
 			array_unshift($message, 'orm');
 		}
 

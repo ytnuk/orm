@@ -54,7 +54,7 @@ abstract class Entity extends Nextras\Orm\Entity\Entity implements Ytnuk\Cache\P
 	 */
 	public function getCacheTags($invalidate = FALSE)
 	{
-		$tags = [$this->getCacheKey() => TRUE];
+		$tags = [current($this->getCacheKey()) => TRUE];
 		if ($invalidate) {
 			$tags += $this->tags;
 			foreach ($this->getMetadata()->getProperties() as $property) {
@@ -80,9 +80,11 @@ abstract class Entity extends Nextras\Orm\Entity\Entity implements Ytnuk\Cache\P
 	 */
 	public function getCacheKey()
 	{
-		return implode('::', [
-			get_class($this),
-			$this->id
-		]);
+		return [
+			implode('::', [
+				get_class($this),
+				$this->id
+			])
+		];
 	}
 }
