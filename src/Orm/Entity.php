@@ -37,8 +37,7 @@ abstract class Entity extends Nextras\Orm\Entity\Entity implements Ytnuk\Cache\P
 	 */
 	public function setValue($name, $value)
 	{
-		$property = $this->metadata->getProperty($name);
-		if (is_subclass_of($property->container, Nextras\Orm\Relationships\HasOne::class) && $this->hasValue($name) && $entity = $this->getValue($name)) {
+		if ($this->metadata->hasProperty($name) && is_subclass_of($this->metadata->getProperty($name)->container, Nextras\Orm\Relationships\HasOne::class) && $this->hasValue($name) && $entity = $this->getValue($name)) {
 			if ($entity instanceof Ytnuk\Cache\Provider) {
 				$this->tags += $entity->getCacheTags(TRUE);
 			}
@@ -48,13 +47,13 @@ abstract class Entity extends Nextras\Orm\Entity\Entity implements Ytnuk\Cache\P
 	}
 
 	/**
-	 * @param bool $invalidate
-	 *
 	 * @inheritdoc
+	 *
+	 * @param bool $invalidate
 	 */
 	public function getCacheTags($invalidate = FALSE)
 	{
-		$tags = [current($this->getCacheKey()) => TRUE];
+		$tags = [implode('::', $this->getCacheKey()) => TRUE];
 		if ($invalidate) {
 			$tags += $this->tags;
 			foreach ($this->getMetadata()->getProperties() as $property) {
@@ -69,7 +68,7 @@ abstract class Entity extends Nextras\Orm\Entity\Entity implements Ytnuk\Cache\P
 				}
 			}
 		} else {
-			$tags[get_class($this)] = TRUE;
+			$tags[static::class] = TRUE;
 		}
 
 		return $tags;
@@ -81,10 +80,8 @@ abstract class Entity extends Nextras\Orm\Entity\Entity implements Ytnuk\Cache\P
 	public function getCacheKey()
 	{
 		return [
-			implode('::', [
-				get_class($this),
-				$this->id
-			])
+			static::class,
+			$this->id
 		];
 	}
 }

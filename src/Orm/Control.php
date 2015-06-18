@@ -15,6 +15,11 @@ abstract class Control extends Ytnuk\Application\Control
 {
 
 	/**
+	 * @var int|array
+	 */
+	protected static $itemsPerPage = 10;
+
+	/**
 	 * @var Nextras\Orm\Entity\IEntity
 	 */
 	private $entity;
@@ -33,7 +38,7 @@ abstract class Control extends Ytnuk\Application\Control
 	protected function createComponentYtnukOrmPaginationControl()
 	{
 		return new Nette\Application\UI\Multiplier(function ($key) {
-			return new Ytnuk\Orm\Pagination\Control($this->entity->getValue($key), $this->entity->itemsPerPage[$key]); //TODO: do not define in entity
+			return new Ytnuk\Orm\Pagination\Control($this->entity->getValue($key), is_array(static::$itemsPerPage) ? (isset(static::$itemsPerPage[$key]) ? static::$itemsPerPage[$key] : self::$itemsPerPage) : static::$itemsPerPage);
 		});
 	}
 }

@@ -354,7 +354,8 @@ abstract class Container extends Ytnuk\Form\Container
 		$repository = $this->model->getRepository($property->relationshipRepository);
 		$collection = $this->entity->getValue($property->name)->getIterator();
 		$parent = $this->lookup(Ytnuk\Orm\Form\Container::class, FALSE);
-		$isNullable = $parent && $parent->getMetadata()->getProperty($this->name)->isNullable;
+		$parentProperty = $parent ? $parent->getMetadata()->getProperty($this->name) : NULL;
+		$isNullable = $parentProperty && $parentProperty->relationshipType === Nextras\Orm\Entity\Reflection\PropertyMetadata::RELATIONSHIP_ONE_HAS_ONE_DIRECTED && $parentProperty->isNullable;
 		if ($isNullable) {
 			$forceDefault = 0;
 		}

@@ -36,4 +36,14 @@ class Control extends Ytnuk\Pagination\Control
 	{
 		return $this->collection->limitBy($this->getPaginator()->getItemsPerPage(), $this->getPaginator()->getOffset());
 	}
+
+	/**
+	 * @inheritdoc
+	 *
+	 * @param Nextras\Orm\Collection\ICollection|NULL $collection
+	 */
+	public function count(Nextras\Orm\Collection\ICollection $collection = NULL)
+	{
+		return $collection ? $collection->countStored() : parent::count();
+	}
 }
