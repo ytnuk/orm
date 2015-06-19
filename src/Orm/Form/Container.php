@@ -104,7 +104,11 @@ abstract class Container extends Ytnuk\Form\Container
 		$this->initEntityRelations();
 		foreach ($values as $property => $value) {
 			if ($this[$property] instanceof Nette\Forms\IControl) {
-				$this->entity->setValue($property, $value === '' ? NULL : $value);
+				$value = $value === '' ? NULL : $value;
+				if ($this[$property] instanceof Nette\Forms\Controls\Checkbox && ! $value && $this->getMetadata()->getProperty($property)->isNullable) {
+					$value = NULL;
+				}
+				$this->entity->setValue($property, $value);
 			}
 		}
 
@@ -353,12 +357,7 @@ abstract class Container extends Ytnuk\Form\Container
 		$this->setCurrentGroup($this->getForm()->addGroup($this->prefixPropertyGroup($property), FALSE));
 		$repository = $this->model->getRepository($property->relationshipRepository);
 		$collection = $this->entity->getValue($property->name)->getIterator();
-		$parent = $this->lookup(Ytnuk\Orm\Form\Container::class, FALSE);
-		$parentProperty = $parent ? $parent->getMetadata()->getProperty($this->name) : NULL;
-		$isNullable = $parentProperty && $parentProperty->relationshipType === Nextras\Orm\Entity\Reflection\PropertyMetadata::RELATIONSHIP_ONE_HAS_ONE_DIRECTED && $parentProperty->isNullable;
-		if ($isNullable) {
-			$forceDefault = 0;
-		}
+		//TODO: form needs to be redrawed because order of $collection could change after save => mismatch of indexes => 500 - unique key fail at db
 		$replicator = $this->addDynamic($property->name, function (Nette\Forms\Container $container) use ($property, $repository, $collection) {
 			if ($entity = $collection->current()) {
 				$collection->next();
@@ -374,14 +373,6 @@ abstract class Container extends Ytnuk\Form\Container
 				$container->removeEntity();
 			});
 		}, max(count($collection), $forceDefault), (bool) $forceDefault);
-		if ($isNullable && $this->getForm()->isSubmitted()) {
-			$containers = array_filter($replicator->getContainers()->getArrayCopy(), function ($container) {
-				return $container instanceof self && ! $container['delete']->isSubmittedBy();
-			});
-			if ( ! $containers) {
-				$this->removeEntity();
-			}
-		}
 		$replicator->getCurrentGroup()->add($add = $replicator->addSubmit('add', $this->formatPropertyAction($property, 'add'))->setValidationScope([$replicator])->addCreateOnClick());
 		if ($this->getForm()->isSubmitted() === $add) {
 			$isValid = TRUE;
