@@ -2,8 +2,8 @@
 
 namespace Ytnuk\Orm\Pagination;
 
-use Ytnuk;
 use Nextras;
+use Ytnuk;
 
 /**
  * Class Control

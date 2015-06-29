@@ -1,6 +1,8 @@
 <?php
 
 namespace Ytnuk\Orm\Pagination\Control;
+
+use Nextras;
 use Ytnuk;
 
 /**
