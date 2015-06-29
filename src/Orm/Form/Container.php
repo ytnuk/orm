@@ -356,23 +356,36 @@ abstract class Container extends Ytnuk\Form\Container
 	{
 		$this->setCurrentGroup($this->getForm()->addGroup($this->prefixPropertyGroup($property), FALSE));
 		$repository = $this->model->getRepository($property->relationshipRepository);
-		$collection = $this->entity->getValue($property->name)->getIterator();
-		//TODO: form needs to be redrawed because order of $collection could change after save => mismatch of indexes => 500 - unique key fail at db
+		$collection = $this->entity->getValue($property->name)->get()->fetchPairs(implode('-', $repository->getEntityMetadata()->getPrimaryKey()));
+		//TODO: need to use another database which supports deferred unique constraints (PostgreSQL) in order to allow switching unique column values
 		$replicator = $this->addDynamic($property->name, function (Nette\Forms\Container $container) use ($property, $repository, $collection) {
-			if ($entity = $collection->current()) {
-				$collection->next();
+			$replicator = $container->parent;
+			$name = $container->getName();
+			unset($container->parent[$name]);
+			if (isset($collection[$name])) {
+				$entity = $collection[$name];
 			} else {
 				$entityClassName = $repository->getEntityMetadata()->getClassName();
 				$entity = new $entityClassName;
 			}
-			$replicator = $container->parent;
-			$name = $container->getName();
-			unset($container->parent[$name]);
 			$replicator->addComponent($container = $this->form->createComponent($entity), $name);
 			$container->addSubmit('delete', $this->formatPropertyAction($property, 'delete'))->addRemoveOnClick(function (Kdyby\Replicator\Container $replicator, self $container) {
 				$container->removeEntity();
 			});
-		}, max(count($collection), $forceDefault), (bool) $forceDefault);
+		});
+		if ($createDefault = max(count($collection), $forceDefault)) {
+			if ( ! $this->getForm()->isSubmitted()) {
+				$count = 0;
+				while ($count++ < $createDefault) {
+					$replicator->createOne(key($collection));
+					next($collection);
+				}
+			} elseif ($forceDefault) {
+				while (iterator_count($replicator->getContainers()) < $createDefault) {
+					$replicator->createOne();
+				}
+			}
+		}
 		$replicator->getCurrentGroup()->add($add = $replicator->addSubmit('add', $this->formatPropertyAction($property, 'add'))->setValidationScope([$replicator])->addCreateOnClick());
 		if ($this->getForm()->isSubmitted() === $add) {
 			$isValid = TRUE;

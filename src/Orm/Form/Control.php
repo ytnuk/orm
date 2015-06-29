@@ -44,6 +44,9 @@ abstract class Control extends Ytnuk\Orm\Control
 				case $form['action']['add']:
 					$presenter->redirect('Presenter:edit', $this->entity->id);
 					break;
+				case $form['action']['edit']:
+					$presenter->forward('this');
+					break;
 				case $form['action']['delete']:
 					$presenter->redirect('Presenter:list');
 					break;
