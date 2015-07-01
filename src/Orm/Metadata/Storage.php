@@ -21,7 +21,7 @@ final class Storage extends Nextras\Orm\Model\MetadataStorage
 	/**
 	 * @var array
 	 */
-	protected $repositories = [];
+	private $repositories = [];
 
 	/**
 	 * @var Nextras\Orm\Model\IRepositoryLoader
