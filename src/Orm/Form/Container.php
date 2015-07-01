@@ -387,7 +387,7 @@ abstract class Container extends Ytnuk\Form\Container
 			}
 		}
 		$replicator->getCurrentGroup()->add($add = $replicator->addSubmit('add', $this->formatPropertyAction($property, 'add'))->setValidationScope([$replicator])->addCreateOnClick());
-		if ($this->getForm()->isSubmitted() === $add) {
+		if ($add->isSubmittedBy()) {
 			$isValid = TRUE;
 			if ($scope = $add->getValidationScope()) {
 				$isValid = ! array_filter($scope, function (Nette\Forms\Container $container) {
@@ -402,7 +402,7 @@ abstract class Container extends Ytnuk\Form\Container
 		}
 		$containers = [];
 		foreach ($replicator->getContainers() as $container) {
-			if ($this->getForm()->isSubmitted() !== $container['delete']) {
+			if ( ! $container['delete']->isSubmittedBy()) {
 				$containers[$container->name] = $container;
 			}
 		}
