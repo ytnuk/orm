@@ -30,7 +30,7 @@ abstract class Repository extends Nextras\Orm\Repository\Repository
 		if ($recursive) {
 			foreach ($entity->getMetadata()->getProperties() as $property) {
 				if ($property->relationshipIsMain && $property->relationshipType === Nextras\Orm\Entity\Reflection\PropertyMetadata::RELATIONSHIP_ONE_HAS_ONE_DIRECTED) {
-					if ($relationEntity = $entity->getValue($property->name)) {
+					if ($entity->hasValue($property->name) && $relationEntity = $entity->getValue($property->name)) {
 						if ($relationEntity->isAttached()) {
 							$relationEntity->getRepository()->remove($relationEntity, $recursive);
 						}

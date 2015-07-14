@@ -28,6 +28,7 @@ final class Control extends Ytnuk\Application\Control
 	 */
 	public function __construct(Ytnuk\Orm\Repository $repository, Ytnuk\Orm\Form\Factory $form)
 	{
+		parent::__construct();
 		$this->repository = $repository;
 		$this->form = $form;
 	}

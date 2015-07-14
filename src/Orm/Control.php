@@ -1,5 +1,4 @@
 <?php
-
 namespace Ytnuk\Orm;
 
 use Ytnuk;
@@ -29,6 +28,7 @@ abstract class Control extends Ytnuk\Application\Control
 	 */
 	public function __construct(Nextras\Orm\Entity\IEntity $entity)
 	{
+		parent::__construct();
 		$this->entity = $entity;
 	}
 

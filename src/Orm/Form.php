@@ -35,6 +35,7 @@ final class Form extends Ytnuk\Form
 	 */
 	public function __construct(Entity $entity, Model $model)
 	{
+		parent::__construct();
 		$this->entity = $entity;
 		$this->model = $model;
 		$this->repository = $model->getRepositoryForEntity($entity);
