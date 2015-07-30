@@ -1,5 +1,4 @@
 <?php
-
 namespace Ytnuk\Orm\Grid\Control;
 
 use Ytnuk;

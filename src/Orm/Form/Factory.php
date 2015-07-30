@@ -1,5 +1,4 @@
 <?php
-
 namespace Ytnuk\Orm\Form;
 
 use Ytnuk;

@@ -1,16 +1,16 @@
 <?php
-
 namespace Ytnuk\Orm\Metadata;
 
-use Nextras;
 use Nette;
+use Nextras;
 
 /**
  * Class Storage
  *
  * @package Ytnuk\Orm
  */
-final class Storage extends Nextras\Orm\Model\MetadataStorage
+final class Storage
+	extends Nextras\Orm\Model\MetadataStorage
 {
 
 	/**
@@ -31,56 +31,114 @@ final class Storage extends Nextras\Orm\Model\MetadataStorage
 	/**
 	 * @inheritdoc
 	 */
-	public function __construct(Nette\Caching\IStorage $cacheStorage, array $entityClasses, Nextras\Orm\Model\IRepositoryLoader $repositoryLoader, array $repositories = [])
-	{
+	public function __construct(
+		Nette\Caching\IStorage $cacheStorage,
+		array $entityClassesMap,
+		Nextras\Orm\Model\IRepositoryLoader $repositoryLoader,
+		array $repositories = []
+	) {
 		$this->repositoryLoader = $repositoryLoader;
 		$this->repositories = $repositories;
-		$cache = new Nette\Caching\Cache($cacheStorage, 'Nextras.Orm.metadata');
-		static::$metadata = $cache->load($entityClasses, function (& $dp) use ($entityClasses, $repositoryLoader) {
-			$metadata = $this->parseMetadata($entityClasses, $dp[Nette\Caching\Cache::FILES]);
-			$validator = new Nextras\Orm\Entity\Reflection\MetadataValidator();
-			$validator->validate($metadata, $repositoryLoader);
+		//parent::__construct();
+		$cache = new Nette\Caching\Cache(
+			$cacheStorage,
+			'Nextras.Orm.metadata'
+		);
+		static::$metadata = $cache->load(
+			$entityClassesMap,
+			function (& $dp) use
+			(
+				$entityClassesMap,
+				$repositoryLoader
+			) {
+				$metadata = $this->parseMetadata(
+					$entityClassesMap,
+					$dp
+				);
+				$validator = new Nextras\Orm\Entity\Reflection\MetadataValidator();
+				$validator->validate(
+					$metadata,
+					$repositoryLoader
+				);
 
-			return $metadata;
-		});
-		new Nextras\Orm\Model\MetadataStorage($cacheStorage, $entityClasses, $repositoryLoader);
+				return $metadata;
+			}
+		);
+		new Nextras\Orm\Model\MetadataStorage(
+			$cacheStorage,
+			$entityClassesMap,
+			$repositoryLoader
+		);
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	private function parseMetadata($entityList, & $fileDependencies)
+	public static function get($className)
 	{
-		$cache = [];
-		$annotationParser = new Nextras\Orm\Entity\Reflection\AnnotationParser;
-		foreach ($entityList as $className) {
-			$cache[$className] = $annotationParser->parseMetadata($className, $fileDependencies);
+		if ( ! isset(static::$metadata[$className])) {
+			return parent::get($className);
 		}
-		foreach ($cache as $entity => $metadata) {
-			foreach ($metadata->getProperties() as $property) {
-				if ( ! $property->relationshipType || ! $this->repositoryLoader->hasRepository($repositoryName = $property->relationshipRepository)) {
+
+		return static::$metadata[$className];
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	private function parseMetadata(
+		$entityClassesMap,
+		& $dp
+	) {
+		$cache = [];
+		$annotationParser = new Nextras\Orm\Entity\Reflection\AnnotationParser($entityClassesMap);
+		foreach (
+			array_keys($entityClassesMap) as $className
+		) {
+			$cache[$className] = $annotationParser->parseMetadata(
+				$className,
+				$dp[Nette\Caching\Cache::FILES]
+			);
+		}
+		foreach (
+			$cache as $entity => $metadata
+		) {
+			foreach (
+				$metadata->getProperties() as $property
+			) {
+				if ( ! ($relationship = $property->relationship) || ! $this->repositoryLoader->hasRepository(
+						$repositoryName = $relationship->repository
+					)
+				) {
 					continue;
 				}
 				$relationshipMetadata = $cache[$relationshipEntity = $repositoryName::getEntityClassNames()[0]];
-				if ( ! $relationshipMetadata->hasProperty($property->relationshipProperty)) {
-					$property->relationshipProperty = implode('__', [
-						str_replace('\\', '_', $metadata->getClassName()),
-						$property->name,
-						$property->relationshipProperty
-					]);
+				if ( ! $relationshipMetadata->hasProperty($relationship->property)) {
+					$relationship->property = implode(
+						'__',
+						[
+							str_replace(
+								'\\',
+								'_',
+								$metadata->getClassName()
+							),
+							$property->name,
+							$relationship->property,
+						]
+					);
 					$relationshipContainer = $property->container;
-					$relationshipIsMain = $property->relationshipIsMain;
-					switch ($relationshipType = $property->relationshipType) {
-						case Nextras\Orm\Entity\Reflection\PropertyMetadata::RELATIONSHIP_ONE_HAS_MANY:
-							$relationshipType = Nextras\Orm\Entity\Reflection\PropertyMetadata::RELATIONSHIP_MANY_HAS_ONE;
+					$relationshipIsMain = $relationship->isMain;
+					switch ($relationshipType = $property->relationship->type) {
+						case Nextras\Orm\Entity\Reflection\PropertyRelationshipMetadata::ONE_HAS_MANY:
+							$relationshipType = Nextras\Orm\Entity\Reflection\PropertyRelationshipMetadata::MANY_HAS_ONE;
 							$relationshipContainer = Nextras\Orm\Relationships\ManyHasOne::class;
 							break;
-						case Nextras\Orm\Entity\Reflection\PropertyMetadata::RELATIONSHIP_MANY_HAS_ONE:
-							$relationshipType = Nextras\Orm\Entity\Reflection\PropertyMetadata::RELATIONSHIP_ONE_HAS_MANY;
+						case Nextras\Orm\Entity\Reflection\PropertyRelationshipMetadata::MANY_HAS_ONE:
+							$relationshipType = Nextras\Orm\Entity\Reflection\PropertyRelationshipMetadata::ONE_HAS_MANY;
 							$relationshipContainer = Nextras\Orm\Relationships\OneHasMany::class;
 							break;
-						case Nextras\Orm\Entity\Reflection\PropertyMetadata::RELATIONSHIP_ONE_HAS_ONE_DIRECTED:
-						case Nextras\Orm\Entity\Reflection\PropertyMetadata::RELATIONSHIP_MANY_HAS_MANY:
+						case Nextras\Orm\Entity\Reflection\PropertyRelationshipMetadata::ONE_HAS_ONE_DIRECTED:
+						case Nextras\Orm\Entity\Reflection\PropertyRelationshipMetadata::MANY_HAS_MANY:
 							$relationshipIsMain = ! $relationshipIsMain;
 							break;
 					}
@@ -93,32 +151,32 @@ final class Storage extends Nextras\Orm\Model\MetadataStorage
 						$types[strtolower($relationshipContainer)] = $types[$key];
 						unset($types[$key]);
 					}
-					$relationshipProperty = new Nextras\Orm\Entity\Reflection\PropertyMetadata($property->relationshipProperty, $types, $property->access);
-					$relationshipProperty->relationshipType = $relationshipType;
+					$relationshipProperty = new Nextras\Orm\Entity\Reflection\PropertyMetadata(
+						$property->relationship->property,
+						$types,
+						$property->access
+					);
+					$relationshipProperty->relationship = new Nextras\Orm\Entity\Reflection\PropertyRelationshipMetadata;
+					$relationshipProperty->relationship->type = $relationshipType;
 					$relationshipProperty->container = $relationshipContainer;
-					$relationshipProperty->relationshipIsMain = $relationshipIsMain;
-					$relationshipProperty->relationshipProperty = $property->name;
+					$relationshipProperty->relationship->isMain = $relationshipIsMain;
+					$relationshipProperty->relationship->property = $property->name;
 					$relationshipProperty->isNullable = TRUE;
-					if (isset($this->repositories[$entity]) && $this->repositoryLoader->hasRepository($relationshipRepository = $this->repositories[$entity])) {
-						$relationshipProperty->relationshipRepository = $relationshipRepository;
+					if (isset($this->repositories[$entity]) && $this->repositoryLoader->hasRepository(
+							$relationshipRepository = $this->repositories[$entity]
+						)
+					) {
+						$relationshipProperty->relationship->repository = $relationshipRepository;
+						$relationshipProperty->relationship->entity = $entity;
 					}
-					$relationshipMetadata->setProperty($relationshipProperty->name, $relationshipProperty);
+					$relationshipMetadata->setProperty(
+						$relationshipProperty->name,
+						$relationshipProperty
+					);
 				}
 			}
 		}
 
 		return $cache;
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public static function get($className)
-	{
-		if ( ! isset(static::$metadata[$className])) {
-			throw new Nextras\Orm\InvalidArgumentException("Entity metadata for '{$className}' does not exist.");
-		}
-
-		return static::$metadata[$className];
 	}
 }

@@ -1,5 +1,4 @@
 <?php
-
 namespace Ytnuk\Orm\Pagination;
 
 use Nextras;
@@ -10,7 +9,8 @@ use Ytnuk;
  *
  * @package Ytnuk\Orm
  */
-class Control extends Ytnuk\Pagination\Control
+class Control
+	extends Ytnuk\Pagination\Control
 {
 
 	/**
@@ -23,18 +23,15 @@ class Control extends Ytnuk\Pagination\Control
 	 *
 	 * @param Nextras\Orm\Collection\ICollection $collection
 	 */
-	public function __construct(Nextras\Orm\Collection\ICollection $collection, $itemsPerPage = 1)
-	{
-		parent::__construct($collection, $itemsPerPage);
+	public function __construct(
+		Nextras\Orm\Collection\ICollection $collection,
+		$itemsPerPage = 1
+	) {
+		parent::__construct(
+			$collection,
+			$itemsPerPage
+		);
 		$this->collection = $collection;
-	}
-
-	/**
-	 * @return Nextras\Orm\Collection\ICollection
-	 */
-	public function getCollection()
-	{
-		return $this->collection->limitBy($this->getPaginator()->getItemsPerPage(), $this->getPaginator()->getOffset());
 	}
 
 	/**
@@ -44,6 +41,17 @@ class Control extends Ytnuk\Pagination\Control
 	 */
 	public function count(Nextras\Orm\Collection\ICollection $collection = NULL)
 	{
-		return $collection ? $collection->countStored() : parent::count();
+		return $collection ? $collection->countStored() : parent::count($collection);
+	}
+
+	/**
+	 * @return Nextras\Orm\Collection\ICollection
+	 */
+	public function getCollection()
+	{
+		return $this->collection->limitBy(
+			$this->getPaginator()->getItemsPerPage(),
+			$this->getPaginator()->getOffset()
+		);
 	}
 }

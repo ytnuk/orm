@@ -8,7 +8,8 @@ use Ytnuk;
  *
  * @package Ytnuk\Orm
  */
-abstract class Control extends Ytnuk\Orm\Control
+abstract class Control
+	extends Ytnuk\Orm\Control
 {
 
 	/**
@@ -25,8 +26,10 @@ abstract class Control extends Ytnuk\Orm\Control
 	 * @param Ytnuk\Orm\Entity $entity
 	 * @param Factory $form
 	 */
-	public function __construct(Ytnuk\Orm\Entity $entity, Factory $form)
-	{
+	public function __construct(
+		Ytnuk\Orm\Entity $entity,
+		Factory $form
+	) {
 		parent::__construct($entity);
 		$this->entity = $entity;
 		$this->form = $form;
@@ -42,7 +45,10 @@ abstract class Control extends Ytnuk\Orm\Control
 			$presenter = $this->getPresenter();
 			switch ($form->isSubmitted()) {
 				case $form['action']['add']:
-					$presenter->redirect('Presenter:edit', $this->entity->id);
+					$presenter->redirect(
+						'Presenter:edit',
+						$this->entity->id
+					);
 					break;
 				case $form['action']['edit']:
 					$presenter->forward('this');

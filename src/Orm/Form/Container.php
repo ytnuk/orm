@@ -1,5 +1,4 @@
 <?php
-
 namespace Ytnuk\Orm\Form;
 
 use Kdyby;
@@ -12,7 +11,8 @@ use Ytnuk;
  *
  * @package Ytnuk\Database
  */
-abstract class Container extends Ytnuk\Form\Container
+abstract class Container
+	extends Ytnuk\Form\Container
 {
 
 	/**
@@ -46,11 +46,19 @@ abstract class Container extends Ytnuk\Form\Container
 	private $relations = [];
 
 	/**
+	 * @var array
+	 */
+	private static $manyHasOneItems = [];
+
+	/**
 	 * @param Ytnuk\Orm\Entity $entity
 	 * @param Ytnuk\Orm\Repository $repository
 	 */
-	public function __construct(Ytnuk\Orm\Entity $entity, Ytnuk\Orm\Repository $repository)
-	{
+	public function __construct(
+		Ytnuk\Orm\Entity $entity,
+		Ytnuk\Orm\Repository $repository
+	) {
+		parent::__construct();
 		$this->entity = $entity;
 		$this->repository = $repository;
 		$this->metadata = $entity->getMetadata();
@@ -99,20 +107,33 @@ abstract class Container extends Ytnuk\Form\Container
 	/**
 	 * @inheritdoc
 	 */
-	public function setValues($values, $erase = FALSE)
-	{
+	public function setValues(
+		$values,
+		$erase = FALSE
+	) {
 		$this->initEntityRelations();
-		foreach ($values as $property => $value) {
+		foreach (
+			$values as $property => $value
+		) {
 			if ($this[$property] instanceof Nette\Forms\IControl) {
 				$value = $value === '' ? NULL : $value;
-				if ($this[$property] instanceof Nette\Forms\Controls\Checkbox && ! $value && $this->metadata->getProperty($property)->isNullable) {
+				if ($this[$property] instanceof Nette\Forms\Controls\Checkbox && ! $value && $this->metadata->getProperty(
+						$property
+					)->isNullable
+				) {
 					$value = NULL;
 				}
-				$this->entity->setValue($property, $value);
+				$this->entity->setValue(
+					$property,
+					$value
+				);
 			}
 		}
 
-		return parent::setValues($values, $erase);
+		return parent::setValues(
+			$values,
+			$erase
+		);
 	}
 
 	/**
@@ -120,8 +141,13 @@ abstract class Container extends Ytnuk\Form\Container
 	 */
 	public function initEntityRelations()
 	{
-		foreach ($this->relations as $property => $value) {
-			$this->entity->setValue($property, $value);
+		foreach (
+			$this->relations as $property => $value
+		) {
+			$this->entity->setValue(
+				$property,
+				$value
+			);
 		}
 
 		return $this->relations;
@@ -155,11 +181,16 @@ abstract class Container extends Ytnuk\Form\Container
 	 */
 	protected function prefixContainer($string)
 	{
-		return $this->prefix(implode('.', [
-			'form',
-			'container',
-			$string
-		]));
+		return $this->prefix(
+			implode(
+				'.',
+				[
+					'form',
+					'container',
+					$string,
+				]
+			)
+		);
 	}
 
 	/**
@@ -169,10 +200,17 @@ abstract class Container extends Ytnuk\Form\Container
 	 */
 	protected function prefix($string)
 	{
-		return implode('.', [
-			str_replace('_', '.', $this->mapper->getTableName()),
-			$string
-		]);
+		return implode(
+			'.',
+			[
+				str_replace(
+					'_',
+					'.',
+					$this->mapper->getTableName()
+				),
+				$string,
+			]
+		);
 	}
 
 	/**
@@ -180,18 +218,40 @@ abstract class Container extends Ytnuk\Form\Container
 	 */
 	protected function addProperties(array $properties)
 	{
-		$path = $this->lookupPath(self::class, FALSE);
-		$delimiter = strpos($path, '-');
+		$path = $this->lookupPath(
+			self::class,
+			FALSE
+		);
+		$delimiter = strpos(
+			$path,
+			'-'
+		);
 		if ($delimiter !== FALSE) {
-			$path = substr($path, 0, $delimiter);
+			$path = substr(
+				$path,
+				0,
+				$delimiter
+			);
 		}
-		$parent = $this->lookup(self::class, FALSE);
-		foreach ($properties as $metadata) {
-			if (in_array($metadata->name, $this->metadata->getPrimaryKey())) {
+		$parent = $this->lookupSelf(FALSE);
+		foreach (
+			$properties as $metadata
+		) {
+			if (in_array(
+				$metadata->name,
+				$this->metadata->getPrimaryKey()
+			)) {
 				continue;
 			}
-			if ($path && $parent && is_subclass_of($metadata->container, Nextras\Orm\Relationships\HasOne::class)) {
-				if ($metadata->relationshipProperty === $path && $metadata->relationshipRepository === get_class($parent->getRepository())) {
+			if ($path && $parent && is_subclass_of(
+					$metadata->container,
+					Nextras\Orm\Relationships\HasOne::class
+				)
+			) {
+				if ($metadata->relationship && $metadata->relationship->property === $path && $metadata->relationship->repository === get_class(
+						$parent->getRepository()
+					)
+				) {
 					$this->relations[$metadata->name] = $parent->getEntity();
 					continue;
 				}
@@ -215,11 +275,19 @@ abstract class Container extends Ytnuk\Form\Container
 				}
 				$component->setDisabled($metadata->isReadonly);
 				$component->setDefaultValue($this->entity->getRawValue($metadata->name));
-				$component->setAttribute('placeholder', $this->formatPropertyPlaceholder($metadata));
+				$component->setAttribute(
+					'placeholder',
+					$this->formatPropertyPlaceholder($metadata)
+				);
 				break;
 			case $component instanceof Nette\ComponentModel\IContainer:
 				if ($metadata->isReadonly) {
-					foreach ($component->getComponents(TRUE, Nette\Forms\Controls\BaseControl::class) as $control) {
+					foreach (
+						$component->getComponents(
+							TRUE,
+							Nette\Forms\Controls\BaseControl::class
+						) as $control
+					) {
 						$value = $control->getValue();
 						$control->setDisabled();
 						$control->setDefaultValue($value);
@@ -238,16 +306,33 @@ abstract class Container extends Ytnuk\Form\Container
 	 */
 	protected function addPropertyComponent(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata)
 	{
-		foreach ([$metadata->name => TRUE] + ($metadata->isVirtual ? [] : $metadata->types + [substr($metadata->container, strrpos($metadata->container, '\\') + 1) => TRUE]) as $type => $value) {
+		foreach (
+			[$metadata->name => TRUE] + ($metadata->isVirtual ? [] : $metadata->types + [
+					substr(
+						$metadata->container,
+						strrpos(
+							$metadata->container,
+							'\\'
+						) + 1
+					) => TRUE,
+				]) as $type => $value
+		) {
 			$method = 'addProperty' . ucfirst($type);
-			if ( ! method_exists($this, $method)) {
+			if ( ! method_exists(
+				$this,
+				$method
+			)
+			) {
 				continue;
 			}
 
-			return call_user_func([
-				$this,
-				$method
-			], $metadata);
+			return call_user_func(
+				[
+					$this,
+					$method,
+				],
+				$metadata
+			);
 		}
 
 		return NULL;
@@ -260,10 +345,13 @@ abstract class Container extends Ytnuk\Form\Container
 	 */
 	protected function formatPropertyPlaceholder(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata)
 	{
-		return implode('.', [
-			$this->prefixProperty($metadata),
-			'placeholder'
-		]);
+		return implode(
+			'.',
+			[
+				$this->prefixProperty($metadata),
+				'placeholder',
+			]
+		);
 	}
 
 	/**
@@ -273,10 +361,15 @@ abstract class Container extends Ytnuk\Form\Container
 	 */
 	protected function prefixProperty(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata)
 	{
-		return $this->prefixContainer(implode('.', [
-			'property',
-			$metadata->name
-		]));
+		return $this->prefixContainer(
+			implode(
+				'.',
+				[
+					'property',
+					$metadata->name,
+				]
+			)
+		);
 	}
 
 	/**
@@ -285,20 +378,25 @@ abstract class Container extends Ytnuk\Form\Container
 	 *
 	 * @return \Nette\Forms\Container|NULL
 	 */
-	protected function addPropertyOneHasOneDirected(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata, $force = FALSE)
-	{
-		if ( ! $force && ! $metadata->relationshipIsMain) {
+	protected function addPropertyOneHasOneDirected(
+		Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata,
+		$force = FALSE
+	) {
+		if ( ! $force && ! $metadata->relationship->isMain) {
 			return NULL;
 		}
 		if ($this->entity->hasValue($metadata->name)) {
 			$entity = $this->entity->getValue($metadata->name);
 		} else {
-			$repository = $this->model->getRepository($metadata->relationshipRepository);
+			$repository = $this->model->getRepository($metadata->relationship->repository);
 			$relationshipEntityClass = $repository->getEntityMetadata()->getClassName();
 			$entity = new $relationshipEntityClass;
 		}
 
-		return $this->addComponent($this->form->createComponent($entity), $metadata->name);
+		return $this->addComponent(
+			$this->form->createComponent($entity),
+			$metadata->name
+		);
 	}
 
 	/**
@@ -308,9 +406,15 @@ abstract class Container extends Ytnuk\Form\Container
 	 */
 	protected function addPropertyManyHasOne(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata)
 	{
-		$repository = $this->model->getRepository($metadata->relationshipRepository);
-		$items = $repository->findAll()->fetchPairs(implode('-', $repository->getEntityMetadata()->getPrimaryKey()));
-		if ($container = $this->lookup(self::class, FALSE)) {
+		$repository = $this->model->getRepository($metadata->relationship->repository);
+		if ( ! isset(self::$manyHasOneItems[$metadata->relationship->repository])) {
+			self::$manyHasOneItems[$metadata->relationship->repository] = $repository->findAll()->fetchPairs(
+				current($repository->getEntityMetadata()->getPrimaryKey())
+			)
+			;
+		}
+		$items = self::$manyHasOneItems[$metadata->relationship->repository];
+		if ($container = $this->lookupSelf(FALSE)) {
 			if ($container->getRepository() === $repository && $entity = $container->getEntity()) {
 				if ($entity->id) {
 					unset($items[$entity->id]);
@@ -318,7 +422,12 @@ abstract class Container extends Ytnuk\Form\Container
 			}
 		}
 
-		return $this->addSelect($metadata->name, $this->formatPropertyLabel($metadata), $items)->setPrompt($this->formatPropertyPrompt($metadata));
+		return $this->addSelect(
+			$metadata->name,
+			$this->formatPropertyLabel($metadata),
+			$items
+		)->setPrompt($this->formatPropertyPrompt($metadata))
+			;
 	}
 
 	/**
@@ -328,10 +437,13 @@ abstract class Container extends Ytnuk\Form\Container
 	 */
 	protected function formatPropertyLabel(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata)
 	{
-		return implode('.', [
-			$this->prefixProperty($metadata),
-			'label'
-		]);
+		return implode(
+			'.',
+			[
+				$this->prefixProperty($metadata),
+				'label',
+			]
+		);
 	}
 
 	/**
@@ -341,10 +453,13 @@ abstract class Container extends Ytnuk\Form\Container
 	 */
 	protected function formatPropertyPrompt(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata)
 	{
-		return implode('.', [
-			$this->prefixProperty($metadata),
-			'placeholder'
-		]);
+		return implode(
+			'.',
+			[
+				$this->prefixProperty($metadata),
+				'placeholder',
+			]
+		);
 	}
 
 	/**
@@ -353,28 +468,65 @@ abstract class Container extends Ytnuk\Form\Container
 	 *
 	 * @return Kdyby\Replicator\Container
 	 */
-	protected function addPropertyOneHasMany(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata, $forceDefault = 0)
-	{
-		$this->setCurrentGroup($this->getForm()->addGroup($this->prefixPropertyGroup($metadata), FALSE));
-		$repository = $this->model->getRepository($metadata->relationshipRepository);
-		$collection = $this->entity->getValue($metadata->name)->get()->fetchPairs(implode('-', $repository->getEntityMetadata()->getPrimaryKey()));
+	protected function addPropertyOneHasMany(
+		Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata,
+		$forceDefault = 0
+	) {
+		$this->setCurrentGroup(
+			$this->getForm()->addGroup(
+				$this->prefixPropertyGroup($metadata),
+				FALSE
+			)
+		);
+		$repository = $this->model->getRepository($metadata->relationship->repository);
+		$collection = $this->entity->getValue($metadata->name)->get()->fetchPairs(
+			current($repository->getEntityMetadata()->getPrimaryKey())
+		)
+		;
 		//TODO: need to use another database which supports deferred unique constraints (PostgreSQL) in order to allow switching unique column values
-		$replicator = $this->addDynamic($metadata->name, function (Nette\Forms\Container $container) use ($metadata, $repository, $collection) {
-			$replicator = $container->parent;
-			$name = $container->getName();
-			unset($container->parent[$name]);
-			if (isset($collection[$name])) {
-				$entity = $collection[$name];
-			} else {
-				$entityClassName = $repository->getEntityMetadata()->getClassName();
-				$entity = new $entityClassName;
+		$replicator = $this->addDynamic(
+			$metadata->name,
+			function (Nette\Forms\Container $container) use
+			(
+				$metadata,
+				$repository,
+				$collection
+			) {
+				$replicator = $container->parent;
+				$name = $container->getName();
+				unset($container->parent[$name]);
+				if (isset($collection[$name])) {
+					$entity = $collection[$name];
+				} else {
+					$entityClassName = $repository->getEntityMetadata()->getClassName();
+					$entity = new $entityClassName;
+				}
+				$replicator->addComponent(
+					$container = $this->form->createComponent($entity),
+					$name
+				);
+				$container->addSubmit(
+					'delete',
+					$this->formatPropertyAction(
+						$metadata,
+						'delete'
+					)
+				)->addRemoveOnClick(
+					function (
+						Kdyby\Replicator\Container $replicator,
+						self $container
+					) {
+						$container->removeEntity();
+					}
+				)
+				;
 			}
-			$replicator->addComponent($container = $this->form->createComponent($entity), $name);
-			$container->addSubmit('delete', $this->formatPropertyAction($metadata, 'delete'))->addRemoveOnClick(function (Kdyby\Replicator\Container $replicator, self $container) {
-				$container->removeEntity();
-			});
-		});
-		if ($createDefault = max(count($collection), $forceDefault)) {
+		);
+		if ($createDefault = max(
+			count($collection),
+			$forceDefault
+		)
+		) {
 			if ( ! $this->getForm()->isSubmitted()) {
 				$count = 0;
 				while ($count++ < $createDefault) {
@@ -387,13 +539,25 @@ abstract class Container extends Ytnuk\Form\Container
 				}
 			}
 		}
-		$replicator->getCurrentGroup()->add($add = $replicator->addSubmit('add', $this->formatPropertyAction($metadata, 'add'))->setValidationScope([$replicator])->addCreateOnClick());
+		$replicator->getCurrentGroup()->add(
+			$add = $replicator->addSubmit(
+				'add',
+				$this->formatPropertyAction(
+					$metadata,
+					'add'
+				)
+			)->setValidationScope([$replicator])->addCreateOnClick()
+		)
+		;
 		if ($add->isSubmittedBy()) {
 			$isValid = TRUE;
 			if ($scope = $add->getValidationScope()) {
-				$isValid = ! array_filter($scope, function (Nette\Forms\Container $container) {
-					return ! $container->isValid();
-				});
+				$isValid = ! array_filter(
+					$scope,
+					function (Nette\Forms\Container $container) {
+						return ! $container->isValid();
+					}
+				);
 			}
 			if ($isValid) {
 				$add->setValidationScope(FALSE);
@@ -402,34 +566,65 @@ abstract class Container extends Ytnuk\Form\Container
 			$add->onClick = [];
 		}
 		$containers = [];
-		foreach ($replicator->getContainers() as $container) {
+		foreach (
+			$replicator->getContainers() as $container
+		) {
 			if ( ! $container['delete']->isSubmittedBy()) {
 				$containers[$container->name] = $container;
 			}
 		}
 		if (count($containers) <= $forceDefault) {
-			array_map(function (self $container) {
-				unset($container['delete']);
-			}, $containers);
-		} else {
-			$persistedContainers = array_filter($containers, function (self $container) {
-				return $container->getEntity()->isPersisted();
-			});
-			if (count($persistedContainers) <= $forceDefault) {
-				array_map(function (self $container) {
+			array_map(
+				function (self $container) {
 					unset($container['delete']);
-				}, $persistedContainers);
+				},
+				$containers
+			);
+		} else {
+			$persistedContainers = array_filter(
+				$containers,
+				function (self $container) {
+					return $container->getEntity()->isPersisted();
+				}
+			);
+			if (count($persistedContainers) <= $forceDefault) {
+				array_map(
+					function (self $container) {
+						unset($container['delete']);
+					},
+					$persistedContainers
+				);
 			}
 		}
-		foreach ($containers as $key => $container) {
-			foreach ($container->getComponents(FALSE, Nette\Forms\Controls\BaseControl::class) as $control) {
+		foreach (
+			$containers as $key => $container
+		) {
+			foreach (
+				$container->getComponents(
+					FALSE,
+					Nette\Forms\Controls\BaseControl::class
+				) as $control
+			) {
 				if ($unique = $control->getOption('unique')) {
-					foreach (array_diff_key($containers, [$key => $container]) as $sibling) {
+					foreach (
+						array_diff_key(
+							$containers,
+							[$key => $container]
+						) as $sibling
+					) {
 						$condition = $control->addCondition(Nette\Forms\Form::FILLED);
 						if (is_string($unique) && isset($container[$unique]) && isset($sibling[$unique])) {
-							$condition = $condition->addConditionOn($container[$unique], Nette\Forms\Form::EQUAL, $sibling[$unique]);
+							$condition = $condition->addConditionOn(
+								$container[$unique],
+								Nette\Forms\Form::EQUAL,
+								$sibling[$unique]
+							);
 						}
-						$condition->addRule(Nette\Forms\Form::NOT_EQUAL, NULL, $sibling[$control->name]);
+						$condition->addRule(
+							Nette\Forms\Form::NOT_EQUAL,
+							NULL,
+							$sibling[$control->name]
+						);
 					}
 				}
 			}
@@ -445,10 +640,13 @@ abstract class Container extends Ytnuk\Form\Container
 	 */
 	protected function prefixPropertyGroup(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata)
 	{
-		return implode('.', [
-			$this->prefixProperty($metadata),
-			'group'
-		]);
+		return implode(
+			'.',
+			[
+				$this->prefixProperty($metadata),
+				'group',
+			]
+		);
 	}
 
 	/**
@@ -457,13 +655,18 @@ abstract class Container extends Ytnuk\Form\Container
 	 *
 	 * @return string
 	 */
-	protected function formatPropertyAction(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata, $action)
-	{
-		return implode('.', [
-			$this->prefixProperty($metadata),
-			'action',
-			$action
-		]);
+	protected function formatPropertyAction(
+		Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata,
+		$action
+	) {
+		return implode(
+			'.',
+			[
+				$this->prefixProperty($metadata),
+				'action',
+				$action,
+			]
+		);
 	}
 
 	/**
@@ -471,7 +674,10 @@ abstract class Container extends Ytnuk\Form\Container
 	 */
 	public function removeEntity($flush = TRUE)
 	{
-		$this->repository->remove($this->entity, TRUE);
+		$this->repository->remove(
+			$this->entity,
+			TRUE
+		);
 		if ($flush) {
 			$this->repository->flush();
 		}
@@ -494,7 +700,10 @@ abstract class Container extends Ytnuk\Form\Container
 	 */
 	protected function addPropertyString(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata)
 	{
-		return $this->addText($metadata->name, $this->formatPropertyLabel($metadata));
+		return $this->addText(
+			$metadata->name,
+			$this->formatPropertyLabel($metadata)
+		);
 	}
 
 	/**
@@ -504,6 +713,22 @@ abstract class Container extends Ytnuk\Form\Container
 	 */
 	protected function addPropertyBool(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata)
 	{
-		return $this->addCheckbox($metadata->name, $this->formatPropertyLabel($metadata));
+		return $this->addCheckbox(
+			$metadata->name,
+			$this->formatPropertyLabel($metadata)
+		);
+	}
+
+	/**
+	 * @param bool $need
+	 *
+	 * @return self
+	 */
+	public function lookupSelf($need = TRUE)
+	{
+		return $this->lookup(
+			self::class,
+			$need
+		);
 	}
 }

@@ -1,9 +1,8 @@
 <?php
-
 namespace Ytnuk\Orm;
 
-use Nextras;
 use Nette;
+use Nextras;
 use Ytnuk;
 
 /**
@@ -11,7 +10,8 @@ use Ytnuk;
  *
  * @package Ytnuk\Orm
  */
-final class Model extends Nextras\Orm\Model\Model
+final class Model
+	extends Nextras\Orm\Model\Model
 {
 
 	/**
@@ -22,13 +22,26 @@ final class Model extends Nextras\Orm\Model\Model
 	/**
 	 * @inheritdoc
 	 */
-	public function __construct(array $configuration, Nextras\Orm\Model\IRepositoryLoader $repositoryLoader, Nextras\Orm\Model\MetadataStorage $metadataStorage, Nette\Caching\IStorage $cacheStorage)
-	{
-		parent::__construct($configuration, $repositoryLoader, $metadataStorage);
-		$this->onFlush[] = function () use ($cacheStorage) {
-			$cacheStorage->clean([
-				Nette\Caching\Cache::TAGS => array_keys($this->tags)
-			]);
+	public function __construct(
+		array $configuration,
+		Nextras\Orm\Model\IRepositoryLoader $repositoryLoader,
+		Nextras\Orm\Model\MetadataStorage $metadataStorage,
+		Nette\Caching\IStorage $cacheStorage
+	) {
+		parent::__construct(
+			$configuration,
+			$repositoryLoader,
+			$metadataStorage
+		);
+		$this->onFlush[] = function () use
+		(
+			$cacheStorage
+		) {
+			$cacheStorage->clean(
+				[
+					Nette\Caching\Cache::TAGS => array_keys($this->tags),
+				]
+			);
 		};
 	}
 

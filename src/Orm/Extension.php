@@ -10,7 +10,9 @@ use Ytnuk;
  *
  * @package Ytnuk\Orm
  */
-final class Extension extends Nextras\Orm\Bridges\NetteDI\OrmExtension implements Ytnuk\Config\Provider
+final class Extension
+	extends Nextras\Orm\Bridges\NetteDI\OrmExtension
+	implements Ytnuk\Config\Provider
 {
 
 	/**
@@ -18,7 +20,7 @@ final class Extension extends Nextras\Orm\Bridges\NetteDI\OrmExtension implement
 	 */
 	private $defaults = [
 		'model' => Model::class,
-		'repositories' => []
+		'repositories' => [],
 	];
 
 	/**
@@ -30,18 +32,18 @@ final class Extension extends Nextras\Orm\Bridges\NetteDI\OrmExtension implement
 			self::class => $this->defaults,
 			Ytnuk\Form\Extension::class => [
 				'forms' => [
-					$this->prefix('form')
-				]
+					$this->prefix('form'),
+				],
 			],
 			'services' => [
 				$this->prefix('form') => Form\Factory::class,
-				Grid\Control\Factory::class
+				Grid\Control\Factory::class,
 			],
 			Kdyby\Translation\DI\TranslationExtension::class => [
 				'dirs' => [
-					__DIR__ . '/../../locale'
-				]
-			]
+					__DIR__ . '/../../locale',
+				],
+			],
 		];
 	}
 

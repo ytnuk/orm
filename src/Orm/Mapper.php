@@ -1,5 +1,4 @@
 <?php
-
 namespace Ytnuk\Orm;
 
 use Nextras;
@@ -9,7 +8,8 @@ use Nextras;
  *
  * @package Ytnuk\Orm
  */
-abstract class Mapper extends Nextras\Orm\Mapper\Mapper
+abstract class Mapper
+	extends Nextras\Orm\Mapper\Mapper
 {
 
 	/**
@@ -18,7 +18,10 @@ abstract class Mapper extends Nextras\Orm\Mapper\Mapper
 	public function getTableName()
 	{
 		if ( ! $this->tableName) {
-			$namespace = explode('\\', $this->getReflection()->getNamespaceName());
+			$namespace = explode(
+				'\\',
+				$this->getReflection()->getNamespaceName()
+			);
 			array_shift($namespace);
 			$this->tableName = Nextras\Orm\StorageReflection\StringHelper::underscore(implode($namespace));
 		}
