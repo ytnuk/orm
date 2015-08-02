@@ -59,8 +59,7 @@ final class Control
 			) {
 				return $this->repository->findBy($this->prepareValues($filter))->orderBy(
 					$this->prepareValues($order)
-				)->fetchPairs(current($this->repository->getEntityMetadata()->getPrimaryKey()))
-					;
+				)->fetchPairs(current($this->repository->getEntityMetadata()->getPrimaryKey()));
 			}
 		);
 
@@ -71,8 +70,7 @@ final class Control
 					['id' => $entity->id]
 				) : $this->getPresenter()->link('Presenter:add');
 			}
-		)->filterInputs(['this'])
-			;
+		)->filterInputs(['this']);
 	}
 
 	/**

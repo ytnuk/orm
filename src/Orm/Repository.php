@@ -42,8 +42,7 @@ abstract class Repository
 							$relationEntity->getRepository()->remove(
 								$relationEntity,
 								$recursive
-							)
-							;
+							);
 						}
 					}
 				}

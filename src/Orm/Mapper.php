@@ -26,6 +26,6 @@ abstract class Mapper
 			$this->tableName = Nextras\Orm\StorageReflection\StringHelper::underscore(implode($namespace));
 		}
 
-		return $this->tableName;
+		return $this->tableName ? : parent::getTableName();
 	}
 }

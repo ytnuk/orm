@@ -16,7 +16,7 @@ final class Storage
 	/**
 	 * @inheritDoc
 	 */
-	private static $metadata;
+	protected static $metadata;
 
 	/**
 	 * @var array
@@ -69,6 +69,11 @@ final class Storage
 			$entityClassesMap,
 			$repositoryLoader
 		);
+		parent::__construct(
+			$cacheStorage,
+			$entityClassesMap,
+			$repositoryLoader
+		);
 	}
 
 	/**
@@ -90,6 +95,9 @@ final class Storage
 		$entityClassesMap,
 		& $dp
 	) {
+		/**
+		 * @var Nextras\Orm\Entity\Reflection\EntityMetadata[] $cache
+		 */
 		$cache = [];
 		$annotationParser = new Nextras\Orm\Entity\Reflection\AnnotationParser($entityClassesMap);
 		foreach (
@@ -112,7 +120,14 @@ final class Storage
 				) {
 					continue;
 				}
-				$relationshipMetadata = $cache[$relationshipEntity = $repositoryName::getEntityClassNames()[0]];
+				$relationshipMetadata = $cache[$relationshipEntity = current(
+					call_user_func(
+						[
+							$repositoryName,
+							'getEntityClassNames',
+						]
+					)
+				)];
 				if ( ! $relationshipMetadata->hasProperty($relationship->property)) {
 					$relationship->property = implode(
 						'__',

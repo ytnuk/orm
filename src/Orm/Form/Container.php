@@ -10,6 +10,8 @@ use Ytnuk;
  * Class Container
  *
  * @package Ytnuk\Database
+ * @property-read Ytnuk\Orm\Form $form
+ * @method Kdyby\Replicator\Container addDynamic(string $name, callable $factory, int $createDefault = 0, bool $forceDefault = FALSE)
  */
 abstract class Container
 	extends Ytnuk\Form\Container
@@ -263,7 +265,7 @@ abstract class Container
 	/**
 	 * @param Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata
 	 *
-	 * @return Nette\ComponentModel\IComponent
+	 * @return Nette\ComponentModel\IComponent|Nette\Forms\Controls\BaseControl
 	 */
 	protected function addProperty(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata)
 	{
@@ -410,8 +412,7 @@ abstract class Container
 		if ( ! isset(self::$manyHasOneItems[$metadata->relationship->repository])) {
 			self::$manyHasOneItems[$metadata->relationship->repository] = $repository->findAll()->fetchPairs(
 				current($repository->getEntityMetadata()->getPrimaryKey())
-			)
-			;
+			);
 		}
 		$items = self::$manyHasOneItems[$metadata->relationship->repository];
 		if ($container = $this->lookupSelf(FALSE)) {
@@ -426,8 +427,7 @@ abstract class Container
 			$metadata->name,
 			$this->formatPropertyLabel($metadata),
 			$items
-		)->setPrompt($this->formatPropertyPrompt($metadata))
-			;
+		)->setPrompt($this->formatPropertyPrompt($metadata));
 	}
 
 	/**
@@ -481,8 +481,7 @@ abstract class Container
 		$repository = $this->model->getRepository($metadata->relationship->repository);
 		$collection = $this->entity->getValue($metadata->name)->get()->fetchPairs(
 			current($repository->getEntityMetadata()->getPrimaryKey())
-		)
-		;
+		);
 		//TODO: need to use another database which supports deferred unique constraints (PostgreSQL) in order to allow switching unique column values
 		$replicator = $this->addDynamic(
 			$metadata->name,
@@ -505,6 +504,8 @@ abstract class Container
 					$container = $this->form->createComponent($entity),
 					$name
 				);
+				/** @noinspection PhpUndefinedMethodInspection */
+				/** @noinspection PhpUnusedParameterInspection */
 				$container->addSubmit(
 					'delete',
 					$this->formatPropertyAction(
@@ -518,8 +519,7 @@ abstract class Container
 					) {
 						$container->removeEntity();
 					}
-				)
-				;
+				);
 			}
 		);
 		if ($createDefault = max(
@@ -539,16 +539,16 @@ abstract class Container
 				}
 			}
 		}
-		$replicator->getCurrentGroup()->add(
-			$add = $replicator->addSubmit(
-				'add',
-				$this->formatPropertyAction(
-					$metadata,
-					'add'
-				)
-			)->setValidationScope([$replicator])->addCreateOnClick()
-		)
-		;
+		$add = $replicator->addSubmit(
+			'add',
+			$this->formatPropertyAction(
+				$metadata,
+				'add'
+			)
+		);
+		/** @noinspection PhpUndefinedMethodInspection */
+		$add->setValidationScope([$replicator])->addCreateOnClick();
+		$replicator->getCurrentGroup()->add($add);
 		if ($add->isSubmittedBy()) {
 			$isValid = TRUE;
 			if ($scope = $add->getValidationScope()) {
@@ -565,12 +565,17 @@ abstract class Container
 			$add->click();
 			$add->onClick = [];
 		}
+		/**
+		 * @var self[] $containers
+		 */
 		$containers = [];
 		foreach (
 			$replicator->getContainers() as $container
 		) {
-			if ( ! $container['delete']->isSubmittedBy()) {
-				$containers[$container->name] = $container;
+			if (isset($container['delete'])) {
+				if ($container['delete'] instanceof Nette\Forms\Controls\SubmitButton && ! $container['delete']->isSubmittedBy()) {
+					$containers[$container->name] = $container;
+				}
 			}
 		}
 		if (count($containers) <= $forceDefault) {
@@ -599,6 +604,9 @@ abstract class Container
 		foreach (
 			$containers as $key => $container
 		) {
+			/**
+			 * @var Nette\Forms\Controls\BaseControl $control
+			 */
 			foreach (
 				$container->getComponents(
 					FALSE,
@@ -613,12 +621,14 @@ abstract class Container
 						) as $sibling
 					) {
 						$condition = $control->addCondition(Nette\Forms\Form::FILLED);
-						if (is_string($unique) && isset($container[$unique]) && isset($sibling[$unique])) {
-							$condition = $condition->addConditionOn(
-								$container[$unique],
-								Nette\Forms\Form::EQUAL,
-								$sibling[$unique]
-							);
+						if (is_string($unique) && isset($container[$unique]) && isset($sibling[$unique]) && $uniqueControl = $container[$unique]) {
+							if ($uniqueControl instanceof Nette\Forms\IControl) {
+								$condition = $condition->addConditionOn(
+									$uniqueControl,
+									Nette\Forms\Form::EQUAL,
+									$sibling[$unique]
+								);
+							}
 						}
 						$condition->addRule(
 							Nette\Forms\Form::NOT_EQUAL,

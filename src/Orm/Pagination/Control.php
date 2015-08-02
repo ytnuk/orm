@@ -52,6 +52,6 @@ class Control
 		return $this->collection->limitBy(
 			$this->getPaginator()->getItemsPerPage(),
 			$this->getPaginator()->getOffset()
-		);
+		) ? : parent::getCollection();
 	}
 }

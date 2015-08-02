@@ -52,6 +52,9 @@ final class Form
 	 */
 	public function success(self $form)
 	{
+		/**
+		 * @var Form\Container $container
+		 */
 		$container = $this->getComponent('this');
 		switch ($form->isSubmitted()) {
 			case $this['action']['add']:
@@ -113,18 +116,15 @@ final class Form
 		$action->addSubmit(
 			'add',
 			'orm.form.action.add.label'
-		)->setDisabled($this->entity->isPersisted())
-		;
+		)->setDisabled($this->entity->isPersisted());
 		$action->addSubmit(
 			'edit',
 			'orm.form.action.edit.label'
-		)->setDisabled(! $this->entity->isPersisted())
-		;
+		)->setDisabled(! $this->entity->isPersisted());
 		$action->addSubmit(
 			'delete',
 			'orm.form.action.delete.label'
-		)->setValidationScope(FALSE)->setDisabled(! $this->entity->isPersisted())
-		;
+		)->setValidationScope(FALSE)->setDisabled(! $this->entity->isPersisted());
 		$controlGroupReflection = Nette\Reflection\ClassType::from('Nette\Forms\ControlGroup');
 		$controlsProperty = $controlGroupReflection->getProperty('controls');
 		$controlsProperty->setAccessible(TRUE);
@@ -133,6 +133,9 @@ final class Form
 			foreach (
 				$this->getGroups() as $group
 			) {
+				/**
+				 * @var Nette\Forms\Controls\BaseControl $control
+				 */
 				foreach (
 					$controls = $controlsProperty->getValue($group) as $control
 				) {
@@ -154,6 +157,7 @@ final class Form
 
 	/**
 	 * @inheritdoc
+	 * @return Form\Container
 	 */
 	protected function createComponent($name)
 	{

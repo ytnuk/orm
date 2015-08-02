@@ -50,7 +50,7 @@ final class Model
 	 */
 	public function processEntityCache(Nextras\Orm\Entity\IEntity $entity)
 	{
-		if ($entity instanceof Ytnuk\Cache\Provider) {
+		if ($entity instanceof Entity) {
 			$this->tags += $entity->getCacheTags(TRUE);
 		}
 	}
