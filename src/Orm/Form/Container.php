@@ -565,9 +565,6 @@ abstract class Container
 			$add->click();
 			$add->onClick = [];
 		}
-		/**
-		 * @var self[] $containers
-		 */
 		$containers = [];
 		foreach (
 			$replicator->getContainers() as $container
@@ -604,37 +601,36 @@ abstract class Container
 		foreach (
 			$containers as $key => $container
 		) {
-			/**
-			 * @var Nette\Forms\Controls\BaseControl $control
-			 */
-			foreach (
-				$container->getComponents(
-					FALSE,
-					Nette\Forms\Controls\BaseControl::class
-				) as $control
-			) {
-				if ($unique = $control->getOption('unique')) {
-					foreach (
-						array_diff_key(
-							$containers,
-							[$key => $container]
-						) as $sibling
-					) {
-						$condition = $control->addCondition(Nette\Forms\Form::FILLED);
-						if (is_string($unique) && isset($container[$unique]) && isset($sibling[$unique]) && $uniqueControl = $container[$unique]) {
-							if ($uniqueControl instanceof Nette\Forms\IControl) {
-								$condition = $condition->addConditionOn(
-									$uniqueControl,
-									Nette\Forms\Form::EQUAL,
-									$sibling[$unique]
-								);
+			if ($container instanceof Nette\ComponentModel\IContainer) {
+				foreach (
+					$container->getComponents(
+						FALSE,
+						Nette\Forms\Controls\BaseControl::class
+					) as $control
+				) {
+					if ($control instanceof Nette\Forms\Controls\BaseControl && $unique = $control->getOption('unique')) {
+						foreach (
+							array_diff_key(
+								$containers,
+								[$key => $container]
+							) as $sibling
+						) {
+							$condition = $control->addCondition(Nette\Forms\Form::FILLED);
+							if (is_string($unique) && isset($container[$unique]) && isset($sibling[$unique]) && $uniqueControl = $container[$unique]) {
+								if ($uniqueControl instanceof Nette\Forms\IControl) {
+									$condition = $condition->addConditionOn(
+										$uniqueControl,
+										Nette\Forms\Form::EQUAL,
+										$sibling[$unique]
+									);
+								}
 							}
+							$condition->addRule(
+								Nette\Forms\Form::NOT_EQUAL,
+								NULL,
+								$sibling[$control->name]
+							);
 						}
-						$condition->addRule(
-							Nette\Forms\Form::NOT_EQUAL,
-							NULL,
-							$sibling[$control->name]
-						);
 					}
 				}
 			}

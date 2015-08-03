@@ -3,6 +3,7 @@ namespace Ytnuk\Orm;
 
 use Kdyby;
 use Nette;
+use SplObjectStorage;
 use Ytnuk;
 
 /**
@@ -52,18 +53,17 @@ final class Form
 	 */
 	public function success(self $form)
 	{
-		/**
-		 * @var Form\Container $container
-		 */
 		$container = $this->getComponent('this');
-		switch ($form->isSubmitted()) {
-			case $this['action']['add']:
-			case $this['action']['edit']:
-				$container->persistEntity();
-				break;
-			case $this['action']['delete']:
-				$container->removeEntity();
-				break;
+		if ($container instanceof Form\Container) {
+			switch ($form->isSubmitted()) {
+				case $this['action']['add']:
+				case $this['action']['edit']:
+					$container->persistEntity();
+					break;
+				case $this['action']['delete']:
+					$container->removeEntity();
+					break;
+			}
 		}
 	}
 
@@ -133,23 +133,23 @@ final class Form
 			foreach (
 				$this->getGroups() as $group
 			) {
-				/**
-				 * @var Nette\Forms\Controls\BaseControl $control
-				 */
-				foreach (
-					$controls = $controlsProperty->getValue($group) as $control
-				) {
-					if ( ! $control->lookup(
-						Nette\Forms\Form::class,
-						FALSE
-					)
+				$controls = $controlsProperty->getValue($group);
+				if ($controls instanceof SplObjectStorage) {
+					foreach (
+						$controls as $control
 					) {
-						$detached = TRUE;
-						$controls->detach($control);
+						if ($control instanceof Nette\ComponentModel\Component && ! $control->lookup(
+								Nette\Forms\Form::class,
+								FALSE
+							)
+						) {
+							$detached = TRUE;
+							$controls->detach($control);
+						}
 					}
-				}
-				if ( ! count($controls)) {
-					$this->removeGroup($group);
+					if ( ! count($controls)) {
+						$this->removeGroup($group);
+					}
 				}
 			}
 		} while ($detached);
