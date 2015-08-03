@@ -4,7 +4,8 @@
 		"nextras/orm": "dev-master",
 		"ytnuk/config": "dev-master",
 		"ytnuk/grid": "dev-master",
-		"ytnuk/form": "dev-master"
+		"ytnuk/form": "dev-master",
+		"ytnuk/pagination": "dev-master"
 	},
 	"autoload": {
 		"psr-4": {
