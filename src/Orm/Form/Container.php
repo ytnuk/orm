@@ -10,7 +10,6 @@ use Ytnuk;
  * Class Container
  *
  * @package Ytnuk\Database
- * @property-read Ytnuk\Orm\Form $form
  * @method Kdyby\Replicator\Container addDynamic(string $name, callable $factory, int $createDefault = 0, bool $forceDefault = FALSE)
  */
 abstract class Container
@@ -504,22 +503,28 @@ abstract class Container
 					$container = $this->form->createComponent($entity),
 					$name
 				);
-				/** @noinspection PhpUndefinedMethodInspection */
-				/** @noinspection PhpUnusedParameterInspection */
-				$container->addSubmit(
-					'delete',
-					$this->formatPropertyAction(
-						$metadata,
-						'delete'
-					)
-				)->addRemoveOnClick(
-					function (
-						Kdyby\Replicator\Container $replicator,
-						self $container
-					) {
-						$container->removeEntity();
+				if ($container instanceof Nette\Forms\Container) {
+					$container->addSubmit(
+						'delete',
+						$this->formatPropertyAction(
+							$metadata,
+							'delete'
+						)
+					);
+					if (method_exists(
+						$container,
+						'addRemoveOnClick'
+					)) {
+						$container->addRemoveOnClick(
+							function (
+								Kdyby\Replicator\Container $replicator,
+								self $container
+							) {
+								$container->removeEntity();
+							}
+						);
 					}
-				);
+				}
 			}
 		);
 		if ($createDefault = max(
@@ -546,8 +551,8 @@ abstract class Container
 				'add'
 			)
 		);
-		/** @noinspection PhpUndefinedMethodInspection */
-		$add->setValidationScope([$replicator])->addCreateOnClick();
+		$add->setValidationScope([$replicator]);
+		$add->addCreateOnClick();
 		$replicator->getCurrentGroup()->add($add);
 		if ($add->isSubmittedBy()) {
 			$isValid = TRUE;
