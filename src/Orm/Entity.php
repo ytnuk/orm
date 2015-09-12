@@ -2,13 +2,9 @@
 namespace Ytnuk\Orm;
 
 use Nextras;
+use Traversable;
 use Ytnuk;
 
-/**
- * Class Entity
- *
- * @package Ytnuk\Orm
- */
 abstract class Entity
 	extends Nextras\Orm\Entity\Entity
 	implements Ytnuk\Cache\Provider
@@ -21,25 +17,23 @@ abstract class Entity
 	 */
 	private $tags = [];
 
-	/**
-	 * @return string
-	 */
-	public function __toString()
+	public function __toString() : string
 	{
 		if ( ! $this->hasValue(static::PROPERTY_NAME) || ! $value = $this->getValue(static::PROPERTY_NAME)) {
 			$value = $this->getterId();
 		}
 
-		return (string) $value;
+		return implode(
+			'-',
+			is_array($value) ? $value : ($value instanceof Traversable ? iterator_to_array($value) : [$value])
+		);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function setValue(
 		$name,
 		$value
-	) {
+	) : self
+	{
 		if ($this->metadata->hasProperty($name) && is_subclass_of(
 				$this->metadata->getProperty($name)->container,
 				Nextras\Orm\Relationships\HasOne::class
@@ -56,10 +50,7 @@ abstract class Entity
 		);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
-	public function getCacheKey()
+	public function getCacheKey() : array
 	{
 		return [
 			static::class,
@@ -67,12 +58,7 @@ abstract class Entity
 		];
 	}
 
-	/**
-	 * @inheritdoc
-	 *
-	 * @param bool $invalidate
-	 */
-	public function getCacheTags($invalidate = FALSE)
+	public function getCacheTags($invalidate = FALSE) : array
 	{
 		$tags = [
 			implode(

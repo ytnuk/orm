@@ -3,19 +3,11 @@ namespace Ytnuk\Orm;
 
 use Nextras;
 
-/**
- * Class Repository
- *
- * @package Ytnuk\Orm
- */
 abstract class Repository
 	extends Nextras\Orm\Repository\Repository
 {
 
-	/**
-	 * @inheritdoc
-	 */
-	public static function getEntityClassNames()
+	public static function getEntityClassNames() : array
 	{
 		return array_map(
 			function ($name) {
@@ -25,13 +17,11 @@ abstract class Repository
 		);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function remove(
 		$entity,
 		$recursive = FALSE
-	) {
+	) : Nextras\Orm\Entity\IEntity
+	{
 		if ($recursive) {
 			foreach (
 				$entity->getMetadata()->getProperties() as $property
@@ -55,9 +45,6 @@ abstract class Repository
 		);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function setModel(Nextras\Orm\Model\IModel $model)
 	{
 		parent::setModel($model);

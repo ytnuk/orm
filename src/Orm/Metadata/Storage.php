@@ -4,11 +4,6 @@ namespace Ytnuk\Orm\Metadata;
 use Nette;
 use Nextras;
 
-/**
- * Class Storage
- *
- * @package Ytnuk\Orm
- */
 final class Storage
 	extends Nextras\Orm\Model\MetadataStorage
 {
@@ -28,9 +23,6 @@ final class Storage
 	 */
 	private $repositoryLoader;
 
-	/**
-	 * @inheritdoc
-	 */
 	public function __construct(
 		Nette\Caching\IStorage $cacheStorage,
 		array $entityClassesMap,
@@ -50,7 +42,7 @@ final class Storage
 			(
 				$entityClassesMap,
 				$repositoryLoader
-			) {
+			) : array {
 				$metadata = $this->parseMetadata(
 					$entityClassesMap,
 					$dp
@@ -76,9 +68,6 @@ final class Storage
 		);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public static function get($className)
 	{
 		if ( ! isset(static::$metadata[$className])) {
@@ -88,13 +77,11 @@ final class Storage
 		return static::$metadata[$className];
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	private function parseMetadata(
-		$entityClassesMap,
+		array $entityClassesMap,
 		& $dp
-	) {
+	) : array
+	{
 		$cache = [];
 		$annotationParser = new Nextras\Orm\Entity\Reflection\AnnotationParser($entityClassesMap);
 		foreach (

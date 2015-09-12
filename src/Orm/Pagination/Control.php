@@ -1,14 +1,11 @@
 <?php
 namespace Ytnuk\Orm\Pagination;
 
+use IteratorAggregate;
+use Nette;
 use Nextras;
 use Ytnuk;
 
-/**
- * Class Control
- *
- * @package Ytnuk\Orm
- */
 class Control
 	extends Ytnuk\Pagination\Control
 {
@@ -19,39 +16,32 @@ class Control
 	private $collection;
 
 	/**
-	 * @inheritdoc
-	 *
-	 * @param Nextras\Orm\Collection\ICollection $collection
+	 * @var Nette\Utils\Paginator
 	 */
+	private $paginator;
+
 	public function __construct(
 		Nextras\Orm\Collection\ICollection $collection,
-		$itemsPerPage = 1
+		$itemsPerPage = 1,
+		Nette\Utils\Paginator $paginator = NULL
 	) {
 		parent::__construct(
-			$collection,
-			$itemsPerPage
+			$this->collection = $collection,
+			$itemsPerPage,
+			$this->paginator = $paginator ? : new Nette\Utils\Paginator
 		);
-		$this->collection = $collection;
 	}
 
-	/**
-	 * @inheritdoc
-	 *
-	 * @param Nextras\Orm\Collection\ICollection|NULL $collection
-	 */
-	public function count(Nextras\Orm\Collection\ICollection $collection = NULL)
+	public function count() : int
 	{
-		return $collection ? $collection->countStored() : parent::count($collection);
+		return $this->collection->countStored() ? : parent::count();
 	}
 
-	/**
-	 * @return Nextras\Orm\Collection\ICollection
-	 */
-	public function getCollection()
+	public function getCollection() : IteratorAggregate
 	{
 		return $this->collection->limitBy(
-			$this->getPaginator()->getItemsPerPage(),
-			$this->getPaginator()->getOffset()
+			$this->paginator->getItemsPerPage(),
+			$this->paginator->getOffset()
 		) ? : parent::getCollection();
 	}
 }

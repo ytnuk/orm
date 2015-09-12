@@ -5,11 +5,6 @@ use Nette;
 use Nextras;
 use Ytnuk;
 
-/**
- * Class Control
- *
- * @package Ytnuk\Orm
- */
 abstract class Control
 	extends Ytnuk\Application\Control
 {
@@ -17,7 +12,7 @@ abstract class Control
 	/**
 	 * @var int|array
 	 */
-	protected static $itemsPerPage = 10;
+	protected static $itemsPerPage = 3;
 
 	/**
 	 * @var Nextras\Orm\Entity\IEntity
@@ -25,27 +20,37 @@ abstract class Control
 	private $entity;
 
 	/**
-	 * @param Nextras\Orm\Entity\IEntity $entity
+	 * @var Nette\Caching\IStorage
 	 */
+	private $storage;
+
 	public function __construct(Nextras\Orm\Entity\IEntity $entity)
 	{
 		parent::__construct();
 		$this->entity = $entity;
 	}
 
-	/**
-	 * @return Nette\Application\UI\Multiplier
-	 */
-	protected function createComponentYtnukOrmPaginationControl()
+	public function setCacheStorage(Nette\Caching\IStorage $storage)
+	{
+		parent::setCacheStorage($storage);
+		$this->storage = $storage;
+	}
+
+	protected function createComponentYtnukOrmPaginationControl() : Nette\Application\UI\Multiplier
 	{
 		return new Nette\Application\UI\Multiplier(
-			function ($key) {
-				return new Ytnuk\Orm\Pagination\Control(
+			function ($key) : Ytnuk\Orm\Pagination\Control {
+				$control = new Ytnuk\Orm\Pagination\Control(
 					$this->entity->getValue($key),
 					is_array(
 						static::$itemsPerPage
 					) ? (isset(static::$itemsPerPage[$key]) ? static::$itemsPerPage[$key] : self::$itemsPerPage) : static::$itemsPerPage
 				);
+				if ($this->storage) {
+					$control->setCacheStorage($this->storage);
+				}
+
+				return $control;
 			}
 		);
 	}

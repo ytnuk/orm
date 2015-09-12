@@ -3,11 +3,6 @@ namespace Ytnuk\Orm\Grid;
 
 use Ytnuk;
 
-/**
- * Class Control
- *
- * @package Ytnuk\Orm
- */
 final class Control
 	extends Ytnuk\Application\Control
 {
@@ -22,10 +17,6 @@ final class Control
 	 */
 	private $form;
 
-	/**
-	 * @param Ytnuk\Orm\Repository $repository
-	 * @param Ytnuk\Orm\Form\Factory $form
-	 */
 	public function __construct(
 		Ytnuk\Orm\Repository $repository,
 		Ytnuk\Orm\Form\Factory $form
@@ -35,10 +26,7 @@ final class Control
 		$this->form = $form;
 	}
 
-	/**
-	 * @return Control
-	 */
-	protected function createComponentYtnukGridControl()
+	protected function createComponentYtnukGridControl() : Ytnuk\Grid\Control
 	{
 		$grid = new Ytnuk\Grid\Control(
 			function (Ytnuk\Orm\Entity $entity = NULL) {
@@ -73,18 +61,12 @@ final class Control
 		)->filterInputs(['this']);
 	}
 
-	/**
-	 * @param array $values
-	 * @param string $separator
-	 * @param string|NULL $prefix
-	 *
-	 * @return array
-	 */
 	private function prepareValues(
 		array $values,
-		$separator = '->',
-		$prefix = NULL
-	) {
+		string $separator = '->',
+		string $prefix = NULL
+	) : array
+	{
 		$data = [];
 		foreach (
 			$values as $key => $value

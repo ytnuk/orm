@@ -3,19 +3,11 @@ namespace Ytnuk\Orm;
 
 use Nextras;
 
-/**
- * Class Mapper
- *
- * @package Ytnuk\Orm
- */
 abstract class Mapper
 	extends Nextras\Orm\Mapper\Mapper
 {
 
-	/**
-	 * @inheritdoc
-	 */
-	public function getTableName()
+	public function getTableName() : string
 	{
 		if ( ! $this->tableName) {
 			$namespace = explode(

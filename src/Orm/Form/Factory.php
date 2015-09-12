@@ -3,18 +3,8 @@ namespace Ytnuk\Orm\Form;
 
 use Ytnuk;
 
-/**
- * Interface Factory
- *
- * @package Ytnuk\Orm
- */
 interface Factory
 {
 
-	/**
-	 * @param Ytnuk\Orm\Entity $entity
-	 *
-	 * @return Ytnuk\Orm\Form
-	 */
-	public function create(Ytnuk\Orm\Entity $entity);
+	public function create(Ytnuk\Orm\Entity $entity) : Ytnuk\Orm\Form;
 }

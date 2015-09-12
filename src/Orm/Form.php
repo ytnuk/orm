@@ -6,11 +6,6 @@ use Nette;
 use SplObjectStorage;
 use Ytnuk;
 
-/**
- * Class Form
- *
- * @package Ytnuk\Orm
- */
 final class Form
 	extends Ytnuk\Form
 {
@@ -30,10 +25,6 @@ final class Form
 	 */
 	private $repository;
 
-	/**
-	 * @param Entity $entity
-	 * @param Model $model
-	 */
 	public function __construct(
 		Entity $entity,
 		Model $model
@@ -48,9 +39,6 @@ final class Form
 		];
 	}
 
-	/**
-	 * @param Form $form
-	 */
 	public function success(self $form)
 	{
 		$container = $this->getComponent('this');
@@ -67,10 +55,7 @@ final class Form
 		}
 	}
 
-	/**
-	 * @inheritdoc
-	 */
-	protected function getControl()
+	protected function getControl() : Nette\Application\UI\Control
 	{
 		switch ($this->submitted) {
 			case $this['action']['delete']:
@@ -80,10 +65,7 @@ final class Form
 		return parent::getControl();
 	}
 
-	/**
-	 * @inheritdoc
-	 */
-	protected function formatFlashMessage($type)
+	protected function formatFlashMessage(string $type) : string
 	{
 		$message = [
 			parent::formatFlashMessage($type),
@@ -101,9 +83,6 @@ final class Form
 		);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	protected function attached($control)
 	{
 		parent::attached($control);
@@ -155,10 +134,6 @@ final class Form
 		} while ($detached);
 	}
 
-	/**
-	 * @inheritdoc
-	 * @return Form\Container
-	 */
 	protected function createComponent($name)
 	{
 		if ($name instanceof Entity) {
@@ -176,13 +151,11 @@ final class Form
 		return parent::createComponent($name);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function addGroup(
 		$caption = NULL,
 		$setAsCurrent = TRUE
-	) {
+	) : Nette\Forms\ControlGroup
+	{
 		$group = parent::addGroup(
 			NULL,
 			$setAsCurrent

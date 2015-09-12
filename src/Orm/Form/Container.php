@@ -6,12 +6,6 @@ use Nette;
 use Nextras;
 use Ytnuk;
 
-/**
- * Class Container
- *
- * @package Ytnuk\Database
- * @method Kdyby\Replicator\Container addDynamic(string $name, callable $factory, int $createDefault = 0, bool $forceDefault = FALSE)
- */
 abstract class Container
 	extends Ytnuk\Form\Container
 {
@@ -51,10 +45,6 @@ abstract class Container
 	 */
 	private static $manyHasOneItems = [];
 
-	/**
-	 * @param Ytnuk\Orm\Entity $entity
-	 * @param Ytnuk\Orm\Repository $repository
-	 */
 	public function __construct(
 		Ytnuk\Orm\Entity $entity,
 		Ytnuk\Orm\Repository $repository
@@ -69,34 +59,22 @@ abstract class Container
 		$repository->attach($entity);
 	}
 
-	/**
-	 * @return Ytnuk\Orm\Entity
-	 */
-	public function getEntity()
+	public function getEntity() : Ytnuk\Orm\Entity
 	{
 		return $this->entity;
 	}
 
-	/**
-	 * @return Ytnuk\Orm\Repository
-	 */
-	public function getRepository()
+	public function getRepository() : Ytnuk\Orm\Repository
 	{
 		return $this->repository;
 	}
 
-	/**
-	 * @return Nextras\Orm\Entity\Reflection\EntityMetadata
-	 */
-	public function getMetadata()
+	public function getMetadata() : Nextras\Orm\Entity\Reflection\EntityMetadata
 	{
 		return $this->metadata;
 	}
 
-	/**
-	 * @param bool $flush
-	 */
-	public function persistEntity($flush = TRUE)
+	public function persistEntity(bool $flush = TRUE)
 	{
 		$this->setValues($this->getValues());
 		$this->repository->persist($this->entity);
@@ -105,13 +83,11 @@ abstract class Container
 		}
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function setValues(
 		$values,
 		$erase = FALSE
-	) {
+	) : self
+	{
 		$this->initEntityRelations();
 		foreach (
 			$values as $property => $value
@@ -137,10 +113,7 @@ abstract class Container
 		);
 	}
 
-	/**
-	 * @return Ytnuk\Orm\Entity[]
-	 */
-	public function initEntityRelations()
+	public function initEntityRelations() : array
 	{
 		foreach (
 			$this->relations as $property => $value
@@ -154,9 +127,6 @@ abstract class Container
 		return $this->relations;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function removeComponent(Nette\ComponentModel\IComponent $component)
 	{
 		parent::removeComponent($component);
@@ -165,9 +135,6 @@ abstract class Container
 		}
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	protected function attached($form)
 	{
 		parent::attached($form);
@@ -175,12 +142,7 @@ abstract class Container
 		$this->addProperties($this->metadata->getProperties());
 	}
 
-	/**
-	 * @param string $string
-	 *
-	 * @return string
-	 */
-	protected function prefixContainer($string)
+	protected function prefixContainer(string $string) : string
 	{
 		return $this->prefix(
 			implode(
@@ -194,12 +156,7 @@ abstract class Container
 		);
 	}
 
-	/**
-	 * @param string $string
-	 *
-	 * @return string
-	 */
-	protected function prefix($string)
+	protected function prefix(string $string) : string
 	{
 		return implode(
 			'.',
@@ -214,9 +171,6 @@ abstract class Container
 		);
 	}
 
-	/**
-	 * @param Nextras\Orm\Entity\Reflection\PropertyMetadata[] $properties
-	 */
 	protected function addProperties(array $properties)
 	{
 		$path = $this->lookupPath(
@@ -261,11 +215,6 @@ abstract class Container
 		}
 	}
 
-	/**
-	 * @param Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata
-	 *
-	 * @return Nette\ComponentModel\IComponent|Nette\Forms\Controls\BaseControl
-	 */
 	protected function addProperty(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata)
 	{
 		$component = $this->addPropertyComponent($metadata);
@@ -300,11 +249,6 @@ abstract class Container
 		return $component;
 	}
 
-	/**
-	 * @param Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata
-	 *
-	 * @return Nette\ComponentModel\IComponent
-	 */
 	protected function addPropertyComponent(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata)
 	{
 		foreach (
@@ -339,12 +283,7 @@ abstract class Container
 		return NULL;
 	}
 
-	/**
-	 * @param Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata
-	 *
-	 * @return string
-	 */
-	protected function formatPropertyPlaceholder(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata)
+	protected function formatPropertyPlaceholder(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata) : string
 	{
 		return implode(
 			'.',
@@ -355,12 +294,7 @@ abstract class Container
 		);
 	}
 
-	/**
-	 * @param Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata
-	 *
-	 * @return string
-	 */
-	protected function prefixProperty(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata)
+	protected function prefixProperty(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata) : string
 	{
 		return $this->prefixContainer(
 			implode(
@@ -373,15 +307,9 @@ abstract class Container
 		);
 	}
 
-	/**
-	 * @param Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata
-	 * @param bool $force
-	 *
-	 * @return \Nette\Forms\Container|NULL
-	 */
 	protected function addPropertyOneHasOneDirected(
 		Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata,
-		$force = FALSE
+		bool $force = FALSE
 	) {
 		if ( ! $force && ! $metadata->relationship->isMain) {
 			return NULL;
@@ -400,12 +328,7 @@ abstract class Container
 		);
 	}
 
-	/**
-	 * @param Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata
-	 *
-	 * @return \Nette\Forms\Controls\SelectBox
-	 */
-	protected function addPropertyManyHasOne(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata)
+	protected function addPropertyManyHasOne(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata) : Nette\Forms\Controls\SelectBox
 	{
 		$repository = $this->model->getRepository($metadata->relationship->repository);
 		if ( ! isset(self::$manyHasOneItems[$metadata->relationship->repository])) {
@@ -429,12 +352,7 @@ abstract class Container
 		)->setPrompt($this->formatPropertyPrompt($metadata));
 	}
 
-	/**
-	 * @param Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata
-	 *
-	 * @return string
-	 */
-	protected function formatPropertyLabel(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata)
+	protected function formatPropertyLabel(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata) : string
 	{
 		return implode(
 			'.',
@@ -445,12 +363,7 @@ abstract class Container
 		);
 	}
 
-	/**
-	 * @param Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata
-	 *
-	 * @return string
-	 */
-	protected function formatPropertyPrompt(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata)
+	protected function formatPropertyPrompt(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata) : string
 	{
 		return implode(
 			'.',
@@ -461,16 +374,11 @@ abstract class Container
 		);
 	}
 
-	/**
-	 * @param Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata
-	 * @param int $forceDefault
-	 *
-	 * @return Kdyby\Replicator\Container
-	 */
 	protected function addPropertyOneHasMany(
 		Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata,
-		$forceDefault = 0
-	) {
+		int $forceDefault = 0
+	) : Kdyby\Replicator\Container
+	{
 		$this->setCurrentGroup(
 			$this->getForm()->addGroup(
 				$this->prefixPropertyGroup($metadata),
@@ -510,20 +418,14 @@ abstract class Container
 							$metadata,
 							'delete'
 						)
+					)->addRemoveOnClick(
+						function (
+							Kdyby\Replicator\Container $replicator,
+							self $container
+						) {
+							$container->removeEntity();
+						}
 					);
-					if (method_exists(
-						$container,
-						'addRemoveOnClick'
-					)) {
-						$container->addRemoveOnClick(
-							function (
-								Kdyby\Replicator\Container $replicator,
-								self $container
-							) {
-								$container->removeEntity();
-							}
-						);
-					}
 				}
 			}
 		);
@@ -644,12 +546,7 @@ abstract class Container
 		return $replicator;
 	}
 
-	/**
-	 * @param Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata
-	 *
-	 * @return string
-	 */
-	protected function prefixPropertyGroup(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata)
+	protected function prefixPropertyGroup(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata) : string
 	{
 		return implode(
 			'.',
@@ -660,16 +557,11 @@ abstract class Container
 		);
 	}
 
-	/**
-	 * @param Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata
-	 * @param string $action
-	 *
-	 * @return string
-	 */
 	protected function formatPropertyAction(
 		Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata,
-		$action
-	) {
+		string $action
+	) : string
+	{
 		return implode(
 			'.',
 			[
@@ -680,10 +572,7 @@ abstract class Container
 		);
 	}
 
-	/**
-	 * @param bool $flush
-	 */
-	public function removeEntity($flush = TRUE)
+	public function removeEntity(bool $flush = TRUE)
 	{
 		$this->repository->remove(
 			$this->entity,
@@ -694,22 +583,12 @@ abstract class Container
 		}
 	}
 
-	/**
-	 * @param Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata
-	 *
-	 * @return \Nette\Forms\Controls\TextInput
-	 */
-	protected function addPropertyInt(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata)
+	protected function addPropertyInt(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata) : Nette\Forms\Controls\TextInput
 	{
 		return $this->addPropertyString($metadata)->setType('number');
 	}
 
-	/**
-	 * @param Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata
-	 *
-	 * @return \Nette\Forms\Controls\TextInput
-	 */
-	protected function addPropertyString(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata)
+	protected function addPropertyString(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata) : Nette\Forms\Controls\TextInput
 	{
 		return $this->addText(
 			$metadata->name,
@@ -717,12 +596,7 @@ abstract class Container
 		);
 	}
 
-	/**
-	 * @param Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata
-	 *
-	 * @return \Nette\Forms\Controls\Checkbox
-	 */
-	protected function addPropertyBool(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata)
+	protected function addPropertyBool(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata) : Nette\Forms\Controls\Checkbox
 	{
 		return $this->addCheckbox(
 			$metadata->name,
@@ -730,12 +604,7 @@ abstract class Container
 		);
 	}
 
-	/**
-	 * @param bool $need
-	 *
-	 * @return self
-	 */
-	public function lookupSelf($need = TRUE)
+	public function lookupSelf(bool $need = TRUE)
 	{
 		return $this->lookup(
 			self::class,

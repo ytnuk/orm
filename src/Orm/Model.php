@@ -5,11 +5,6 @@ use Nette;
 use Nextras;
 use Ytnuk;
 
-/**
- * Class Database
- *
- * @package Ytnuk\Orm
- */
 final class Model
 	extends Nextras\Orm\Model\Model
 {
@@ -19,9 +14,6 @@ final class Model
 	 */
 	private $tags = [];
 
-	/**
-	 * @inheritdoc
-	 */
 	public function __construct(
 		array $configuration,
 		Nextras\Orm\Model\IRepositoryLoader $repositoryLoader,
@@ -45,9 +37,6 @@ final class Model
 		};
 	}
 
-	/**
-	 * @param Nextras\Orm\Entity\IEntity $entity
-	 */
 	public function processEntityCache(Nextras\Orm\Entity\IEntity $entity)
 	{
 		if ($entity instanceof Entity) {

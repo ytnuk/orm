@@ -5,11 +5,6 @@ use Kdyby;
 use Nextras;
 use Ytnuk;
 
-/**
- * Class Extension
- *
- * @package Ytnuk\Orm
- */
 final class Extension
 	extends Nextras\Orm\Bridges\NetteDI\OrmExtension
 	implements Ytnuk\Config\Provider
@@ -23,10 +18,7 @@ final class Extension
 		'repositories' => [],
 	];
 
-	/**
-	 * @inheritdoc
-	 */
-	public function getConfigResources()
+	public function getConfigResources() : array
 	{
 		return [
 			self::class => $this->defaults,
@@ -47,19 +39,13 @@ final class Extension
 		];
 	}
 
-	/**
-	 * @inheritdoc
-	 */
-	protected function getRepositoryList($model)
+	protected function getRepositoryList($model) : array
 	{
 		$config = $this->getConfig($this->defaults);
 
 		return parent::getRepositoryList($model) + $config['repositories'];
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	protected function setupMetadataStorage(array $repositoryConfig)
 	{
 		parent::setupMetadataStorage($repositoryConfig);
