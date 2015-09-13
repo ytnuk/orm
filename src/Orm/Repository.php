@@ -7,16 +7,6 @@ abstract class Repository
 	extends Nextras\Orm\Repository\Repository
 {
 
-	public static function getEntityClassNames() : array
-	{
-		return array_map(
-			function ($name) {
-				return $name . 'Entity';
-			},
-			parent::getEntityClassNames()
-		);
-	}
-
 	public function remove(
 		$entity,
 		$recursive = FALSE
