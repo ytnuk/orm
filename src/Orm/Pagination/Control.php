@@ -22,7 +22,7 @@ class Control
 
 	public function __construct(
 		Nextras\Orm\Collection\ICollection $collection,
-		$itemsPerPage = 1,
+		int $itemsPerPage = 1,
 		Nette\Utils\Paginator $paginator = NULL
 	) {
 		parent::__construct(
