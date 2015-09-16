@@ -31,7 +31,7 @@ final class Control
 		$grid = new Ytnuk\Grid\Control(
 			function (Ytnuk\Orm\Entity $entity = NULL) {
 				if ( ! $entity) {
-					$entityClass = $this->repository->getEntityClassName([]);
+					$entityClass = $this->repository->getEntityMetadata()->getClassName();
 					$entity = new $entityClass;
 				}
 				$form = $this->form->create($entity);

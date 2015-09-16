@@ -389,7 +389,6 @@ abstract class Container
 		$collection = $this->entity->getValue($metadata->name)->get()->fetchPairs(
 			current($repository->getEntityMetadata()->getPrimaryKey())
 		);
-		//TODO: need to use another database which supports deferred unique constraints (PostgreSQL) in order to allow switching unique column values
 		$replicator = $this->addDynamic(
 			$metadata->name,
 			function (Nette\Forms\Container $container) use
