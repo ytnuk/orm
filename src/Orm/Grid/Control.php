@@ -55,7 +55,7 @@ final class Control
 			function ($entity) {
 				return $entity ? $this->getPresenter()->link(
 					'Presenter:edit',
-					['id' => $entity->id]
+					[current($this->repository->getEntityMetadata()->getPrimaryKey()) => $entity->id]
 				) : $this->getPresenter()->link('Presenter:add');
 			}
 		)->filterInputs(['this']);

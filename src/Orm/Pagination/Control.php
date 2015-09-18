@@ -37,11 +37,11 @@ class Control
 		return $this->collection->countStored() ? : parent::count();
 	}
 
-	public function getCollection() : IteratorAggregate
+	public function getIterator() : IteratorAggregate
 	{
 		return $this->collection->limitBy(
 			$this->paginator->getItemsPerPage(),
 			$this->paginator->getOffset()
-		) ? : parent::getCollection();
+		) ? : parent::getIterator();
 	}
 }

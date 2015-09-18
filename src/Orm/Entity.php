@@ -1,13 +1,14 @@
 <?php
 namespace Ytnuk\Orm;
 
+use JsonSerializable;
 use Nextras;
 use Traversable;
 use Ytnuk;
 
 abstract class Entity
 	extends Nextras\Orm\Entity\Entity
-	implements Ytnuk\Cache\Provider
+	implements Ytnuk\Cache\Provider, JsonSerializable
 {
 
 	const PROPERTY_NAME = 'id';
@@ -94,5 +95,10 @@ abstract class Entity
 		}
 
 		return $tags;
+	}
+
+	function jsonSerialize()
+	{
+		return $this->getterId();
 	}
 }
