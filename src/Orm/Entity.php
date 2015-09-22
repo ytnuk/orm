@@ -41,7 +41,7 @@ abstract class Entity
 			) && $this->hasValue($name) && $entity = $this->getValue($name)
 		) {
 			if ($entity instanceof self) {
-				$this->tags += $entity->getCacheTags(TRUE);
+				$this->tags += $entity->getCacheTags($name);
 			}
 		}
 
