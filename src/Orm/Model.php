@@ -34,6 +34,7 @@ final class Model
 					Nette\Caching\Cache::TAGS => array_keys($this->tags),
 				]
 			);
+			$this->tags = [];
 		};
 	}
 

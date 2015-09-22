@@ -40,7 +40,7 @@ abstract class Entity
 				Nextras\Orm\Relationships\HasOne::class
 			) && $this->hasValue($name) && $entity = $this->getValue($name)
 		) {
-			if ($entity instanceof self) {
+			if ($entity instanceof self && $entity->isPersisted()) {
 				$this->tags += $entity->getCacheTags($name);
 			}
 		}
