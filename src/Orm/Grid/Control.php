@@ -7,6 +7,8 @@ final class Control
 	extends Ytnuk\Application\Control
 {
 
+	const NAME = 'grid';
+
 	/**
 	 * @var Ytnuk\Orm\Repository
 	 */
@@ -26,7 +28,7 @@ final class Control
 		$this->form = $form;
 	}
 
-	protected function createComponentYtnukGridControl() : Ytnuk\Grid\Control
+	protected function createComponentGrid() : Ytnuk\Grid\Control
 	{
 		$grid = new Ytnuk\Grid\Control(
 			function (Ytnuk\Orm\Entity $entity = NULL) {

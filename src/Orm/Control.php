@@ -36,7 +36,7 @@ abstract class Control
 		$this->storage = $storage;
 	}
 
-	protected function createComponentYtnukOrmPaginationControl() : Nette\Application\UI\Multiplier
+	protected function createComponentPagination() : Nette\Application\UI\Multiplier
 	{
 		return new Nette\Application\UI\Multiplier(
 			function ($key) : Ytnuk\Orm\Pagination\Control {

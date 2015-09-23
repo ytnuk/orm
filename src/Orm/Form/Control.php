@@ -7,6 +7,8 @@ abstract class Control
 	extends Ytnuk\Orm\Control
 {
 
+	const NAME = 'form';
+
 	/**
 	 * @var Ytnuk\Orm\Entity
 	 */
@@ -26,7 +28,7 @@ abstract class Control
 		$this->form = $form;
 	}
 
-	protected function createComponentYtnukOrmForm() : Ytnuk\Orm\Form
+	protected function createComponentForm() : Ytnuk\Orm\Form
 	{
 		$form = $this->form->create($this->entity);
 		$form->onSuccess[] = function (Ytnuk\Orm\Form $form) {
