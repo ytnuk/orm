@@ -83,7 +83,7 @@ final class Storage
 	) : array
 	{
 		$cache = [];
-		$annotationParser = new Nextras\Orm\Entity\Reflection\AnnotationParser($entityClassesMap);
+		$annotationParser = new Nextras\Orm\Entity\Reflection\MetadataParser($entityClassesMap);
 		foreach (
 			array_keys($entityClassesMap) as $className
 		) {
