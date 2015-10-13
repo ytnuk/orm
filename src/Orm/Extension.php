@@ -16,6 +16,7 @@ final class Extension
 	private $defaults = [
 		'model' => Model::class,
 		'repositories' => [],
+		'metadataParserFactory' => Metadata\Parser\Factory::class,
 	];
 
 	public function getConfigResources() : array
@@ -44,14 +45,5 @@ final class Extension
 		$config = $this->getConfig($this->defaults);
 
 		return parent::getRepositoryList($model) + $config['repositories'];
-	}
-
-	protected function setupMetadataStorage(array $repositoryConfig)
-	{
-		parent::setupMetadataStorage($repositoryConfig);
-		$storage = $this->getContainerBuilder()->getDefinition($this->prefix('metadataStorage'));
-		$storage->setClass(Metadata\Storage::class);
-		$storage->getFactory()->setEntity($storage->getClass());
-		$storage->getFactory()->arguments['repositories'] = $repositoryConfig[2];
 	}
 }
