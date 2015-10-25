@@ -31,7 +31,7 @@ final class Model
 		) {
 			$cacheStorage->clean(
 				[
-					Nette\Caching\Cache::TAGS => array_keys($this->tags),
+					Nette\Caching\Cache::TAGS => $this->tags,
 				]
 			);
 			$this->tags = [];
@@ -41,7 +41,10 @@ final class Model
 	public function processEntityCache(Nextras\Orm\Entity\IEntity $entity)
 	{
 		if ($entity instanceof Entity && $entity->isPersisted()) {
-			$this->tags += $entity->getCacheTags(TRUE);
+			$this->tags = array_merge(
+				$this->tags,
+				$entity->getCacheTags(TRUE)
+			);
 		}
 	}
 }

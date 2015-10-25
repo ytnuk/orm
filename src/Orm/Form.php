@@ -55,32 +55,21 @@ final class Form
 		}
 	}
 
-	protected function getControl() : Nette\Application\UI\Control
+	public function addGroup(
+		$caption = NULL,
+		$setAsCurrent = TRUE
+	) : Nette\Forms\ControlGroup
 	{
-		switch ($this->submitted) {
-			case $this['action']['delete']:
-				return $this->getPresenter();
-		}
-
-		return parent::getControl();
-	}
-
-	protected function formatFlashMessage(string $type) : string
-	{
-		$message = [
-			parent::formatFlashMessage($type),
-		];
-		if ($this->submitted instanceof Nette\Forms\Controls\Button && $this->submitted->getParent() === $this['action']) {
-			array_unshift(
-				$message,
-				'orm'
-			);
-		}
-
-		return implode(
-			'.',
-			$message
+		$group = parent::addGroup(
+			NULL,
+			$setAsCurrent
 		);
+		$group->setOption(
+			'label',
+			$caption
+		);
+
+		return $group;
 	}
 
 	protected function attached($control)
@@ -151,20 +140,31 @@ final class Form
 		return parent::createComponent($name);
 	}
 
-	public function addGroup(
-		$caption = NULL,
-		$setAsCurrent = TRUE
-	) : Nette\Forms\ControlGroup
+	protected function formatFlashMessage(string $type) : string
 	{
-		$group = parent::addGroup(
-			NULL,
-			$setAsCurrent
-		);
-		$group->setOption(
-			'label',
-			$caption
-		);
+		$message = [
+			parent::formatFlashMessage($type),
+		];
+		if ($this->submitted instanceof Nette\Forms\Controls\Button && $this->submitted->getParent() === $this['action']) {
+			array_unshift(
+				$message,
+				'orm'
+			);
+		}
 
-		return $group;
+		return implode(
+			'.',
+			$message
+		);
+	}
+
+	protected function getControl() : Nette\Application\UI\Control
+	{
+		switch ($this->submitted) {
+			case $this['action']['delete']:
+				return $this->getPresenter();
+		}
+
+		return parent::getControl();
 	}
 }

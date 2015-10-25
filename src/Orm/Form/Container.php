@@ -11,6 +11,11 @@ abstract class Container
 {
 
 	/**
+	 * @var array
+	 */
+	private static $manyHasOneItems = [];
+
+	/**
 	 * @var Ytnuk\Orm\Entity
 	 */
 	private $entity;
@@ -39,11 +44,6 @@ abstract class Container
 	 * @var Ytnuk\Orm\Entity[]
 	 */
 	private $relations = [];
-
-	/**
-	 * @var array
-	 */
-	private static $manyHasOneItems = [];
 
 	public function __construct(
 		Ytnuk\Orm\Entity $entity,
@@ -83,6 +83,54 @@ abstract class Container
 		}
 	}
 
+	public function initEntityRelations() : array
+	{
+		foreach (
+			$this->relations as $property => $value
+		) {
+			$this->entity->setValue(
+				$property,
+				$value
+			);
+		}
+
+		return $this->relations;
+	}
+
+	public function removeEntity(bool $flush = TRUE)
+	{
+		$this->repository->remove(
+			$this->entity,
+			TRUE
+		);
+		if ($flush) {
+			$this->repository->flush();
+		}
+	}
+
+	public function lookupSelf(bool $need = TRUE)
+	{
+		return $this->lookup(
+			self::class,
+			$need
+		);
+	}
+
+	protected function attached($form)
+	{
+		parent::attached($form);
+		$this->setCurrentGroup($this->getForm()->addGroup($this->prefixContainer('group')));
+		$this->addProperties($this->metadata->getProperties());
+	}
+
+	public function removeComponent(Nette\ComponentModel\IComponent $component)
+	{
+		parent::removeComponent($component);
+		if ($component instanceof self) {
+			$component->initEntityRelations();
+		}
+	}
+
 	public function setValues(
 		$values,
 		$erase = FALSE
@@ -111,35 +159,6 @@ abstract class Container
 			$values,
 			$erase
 		);
-	}
-
-	public function initEntityRelations() : array
-	{
-		foreach (
-			$this->relations as $property => $value
-		) {
-			$this->entity->setValue(
-				$property,
-				$value
-			);
-		}
-
-		return $this->relations;
-	}
-
-	public function removeComponent(Nette\ComponentModel\IComponent $component)
-	{
-		parent::removeComponent($component);
-		if ($component instanceof self) {
-			$component->initEntityRelations();
-		}
-	}
-
-	protected function attached($form)
-	{
-		parent::attached($form);
-		$this->setCurrentGroup($this->getForm()->addGroup($this->prefixContainer('group')));
-		$this->addProperties($this->metadata->getProperties());
 	}
 
 	protected function prefixContainer(string $string) : string
@@ -571,17 +590,6 @@ abstract class Container
 		);
 	}
 
-	public function removeEntity(bool $flush = TRUE)
-	{
-		$this->repository->remove(
-			$this->entity,
-			TRUE
-		);
-		if ($flush) {
-			$this->repository->flush();
-		}
-	}
-
 	protected function addPropertyInt(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata) : Nette\Forms\Controls\TextInput
 	{
 		return $this->addPropertyString($metadata)->setType('number');
@@ -600,14 +608,6 @@ abstract class Container
 		return $this->addCheckbox(
 			$metadata->name,
 			$this->formatPropertyLabel($metadata)
-		);
-	}
-
-	public function lookupSelf(bool $need = TRUE)
-	{
-		return $this->lookup(
-			self::class,
-			$need
 		);
 	}
 }

@@ -41,7 +41,10 @@ abstract class Entity
 			) && $this->hasValue($name) && $entity = $this->getValue($name)
 		) {
 			if ($entity instanceof self && $entity->isPersisted()) {
-				$this->tags += $entity->getCacheTags($name);
+				$this->tags = array_merge(
+					$this->tags,
+					$entity->getCacheTags($name)
+				);
 			}
 		}
 
@@ -65,10 +68,13 @@ abstract class Entity
 			implode(
 				'::',
 				$this->getCacheKey()
-			) => TRUE,
+			),
 		];
 		if ($invalidate) {
-			$tags += $this->tags;
+			$tags = array_merge(
+				$tags,
+				$this->tags
+			);
 			foreach (
 				$this->getMetadata()->getProperties() as $property
 			) {
@@ -86,12 +92,15 @@ abstract class Entity
 					$entities as $entity
 				) {
 					if ($entity instanceof self) {
-						$tags += $entity->getCacheTags($property->name);
+						$tags = array_merge(
+							$tags,
+							$entity->getCacheTags($property->name)
+						);
 					}
 				}
 			}
 		} else {
-			$tags[static::class] = TRUE;
+			$tags[] = static::class;
 		}
 
 		return $tags;
