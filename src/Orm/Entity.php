@@ -21,7 +21,7 @@ abstract class Entity
 	public function __toString() : string
 	{
 		if ( ! $this->hasValue(static::PROPERTY_NAME) || ! $value = $this->getValue(static::PROPERTY_NAME)) {
-			$value = $this->getterId();
+			$value = $this->getValue(self::PROPERTY_NAME);
 		}
 
 		return implode(
@@ -108,6 +108,6 @@ abstract class Entity
 
 	function jsonSerialize()
 	{
-		return $this->getterId();
+		return $this->getValue(self::PROPERTY_NAME);
 	}
 }
