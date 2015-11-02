@@ -2,7 +2,6 @@
 	"name": "ytnuk/orm",
 	"require": {
 		"nextras/orm": "dev-master",
-		"ytnuk/config": "dev-master",
 		"ytnuk/grid": "dev-master",
 		"ytnuk/form": "dev-master",
 		"ytnuk/pagination": "dev-master"
