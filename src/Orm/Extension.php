@@ -7,7 +7,7 @@ use Ytnuk;
 
 final class Extension
 	extends Nextras\Orm\Bridges\NetteDI\OrmExtension
-	implements Ytnuk\Config\Provider
+	implements Kdyby\Translation\DI\ITranslationProvider, Ytnuk\Form\Provider
 {
 
 	/**
@@ -19,31 +19,42 @@ final class Extension
 		'metadataParserFactory' => Metadata\Parser\Factory::class,
 	];
 
-	public function getConfigResources() : array
+	public function loadConfiguration()
+	{
+		$this->validateConfig($this->defaults);
+		$providers = $this->compiler->getExtensions(Provider::class);
+		array_walk(
+			$providers,
+			function (Provider $provider) {
+				$this->config = $this->validateConfig(
+					$this->config,
+					$provider->getOrmResources()
+				);
+			}
+		);
+		parent::loadConfiguration();
+		$builder = $this->getContainerBuilder();
+		$builder->addDefinition($this->prefix('grid.control'))->setImplement(Grid\Control\Factory::class);
+	}
+
+	public function getTranslationResources() : array
 	{
 		return [
-			self::class => $this->defaults,
-			Ytnuk\Form\Extension::class => [
-				'forms' => [
-					$this->prefix('form'),
-				],
-			],
-			'services' => [
-				$this->prefix('form') => Form\Factory::class,
-				Grid\Control\Factory::class,
-			],
-			Kdyby\Translation\DI\TranslationExtension::class => [
-				'dirs' => [
-					__DIR__ . '/../../locale',
-				],
+			__DIR__ . '/../../locale',
+		];
+	}
+
+	public function getFormResources() : array
+	{
+		return [
+			'forms' => [
+				Form\Factory::class,
 			],
 		];
 	}
 
 	protected function getRepositoryList($model) : array
 	{
-		$config = $this->getConfig($this->defaults);
-
-		return parent::getRepositoryList($model) + $config['repositories'];
+		return parent::getRepositoryList($model) + $this->config['repositories'];
 	}
 }
