@@ -326,7 +326,7 @@ abstract class Container
 		);
 	}
 
-	protected function addPropertyOneHasOneDirected(
+	protected function addPropertyOneHasOne(
 		Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata,
 		bool $force = FALSE
 	) {

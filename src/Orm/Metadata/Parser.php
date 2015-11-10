@@ -88,7 +88,7 @@ class Parser
 					$relationshipType = Nextras\Orm\Entity\Reflection\PropertyRelationshipMetadata::ONE_HAS_MANY;
 					$relationshipContainer = Nextras\Orm\Relationships\OneHasMany::class;
 					break;
-				case Nextras\Orm\Entity\Reflection\PropertyRelationshipMetadata::ONE_HAS_ONE_DIRECTED:
+				case Nextras\Orm\Entity\Reflection\PropertyRelationshipMetadata::ONE_HAS_ONE:
 				case Nextras\Orm\Entity\Reflection\PropertyRelationshipMetadata::MANY_HAS_MANY:
 					$relationshipIsMain = ! $relationshipIsMain;
 					break;
