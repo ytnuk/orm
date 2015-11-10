@@ -21,17 +21,13 @@ class Parser
 		$class,
 		& $fileDependencies
 	) {
-		if (isset($this->classMetadata[$class])) {
-			list($metadata, $fileDependencies) = $this->classMetadata[$class];
-		} else {
-			$this->classMetadata[$class] = [
-				$metadata = parent::parseMetadata(
-					$class,
-					$fileDependencies
-				),
-				$fileDependencies,
-			];
-		}
+		list($metadata, $fileDependencies) = $this->classMetadata[$class] ?? ($this->classMetadata[$class] = [
+			parent::parseMetadata(
+				$class,
+				$fileDependencies
+			),
+			$fileDependencies,
+		]);
 		foreach (
 			$metadata->getProperties() as $property
 		) {
@@ -94,12 +90,12 @@ class Parser
 					break;
 			}
 			$types = $propertyMetadata->types;
-			if (isset($types[$key = $propertyMetadata->relationship->entity])) {
-				$types[$class] = $types[$key];
+			if ($typeKey = $types[$key = $propertyMetadata->relationship->entity] ?? NULL) {
+				$types[$class] = $typeKey;
 				unset($types[$key]);
 			}
-			if (isset($types[$key = $propertyMetadata->container])) {
-				$types[$relationshipContainer] = $types[$key];
+			if ($typeKey = $types[$key = $propertyMetadata->container] ?? NULL) {
+				$types[$relationshipContainer] = $typeKey;
 				unset($types[$key]);
 			}
 			$relationshipProperty = new Nextras\Orm\Entity\Reflection\PropertyMetadata;
@@ -112,8 +108,7 @@ class Parser
 			$relationshipProperty->relationship->isMain = $relationshipIsMain;
 			$relationshipProperty->relationship->property = $propertyMetadata->name;
 			$relationshipProperty->isNullable = TRUE;
-			if (isset($this->entityClassesMap[$class])) {
-				$relationshipProperty->relationship->repository = $this->entityClassesMap[$class];
+			if ($relationshipProperty->relationship->repository = $this->entityClassesMap[$class] ?? NULL) {
 				$relationshipProperty->relationship->entity = $class;
 			}
 			$relationshipMetadata->setProperty(

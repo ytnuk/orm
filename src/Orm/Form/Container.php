@@ -419,9 +419,7 @@ abstract class Container
 				$replicator = $container->parent;
 				$name = $container->getName();
 				unset($container->parent[$name]);
-				if (isset($collection[$name])) {
-					$entity = $collection[$name];
-				} else {
+				if ( ! $entity = $collection[$name] ?? NULL) {
 					$entityClassName = $repository->getEntityMetadata()->getClassName();
 					$entity = new $entityClassName;
 				}
@@ -494,10 +492,9 @@ abstract class Container
 		foreach (
 			$replicator->getContainers() as $container
 		) {
-			if (isset($container['delete'])) {
-				if ($container['delete'] instanceof Nette\Forms\Controls\SubmitButton && ! $container['delete']->isSubmittedBy()) {
-					$containers[$container->name] = $container;
-				}
+			$delete = $container['delete'] ?? NULL;
+			if ($delete instanceof Nette\Forms\Controls\SubmitButton && ! $delete->isSubmittedBy()) {
+				$containers[$container->name] = $container;
 			}
 		}
 		if (count($containers) <= $forceDefault) {
@@ -541,7 +538,7 @@ abstract class Container
 							) as $sibling
 						) {
 							$condition = $control->addCondition(Nette\Forms\Form::FILLED);
-							if (is_string($unique) && isset($container[$unique]) && isset($sibling[$unique]) && $uniqueControl = $container[$unique]) {
+							if (is_string($unique) && isset($sibling[$unique]) && $uniqueControl = $container[$unique] ?? NULL) {
 								if ($uniqueControl instanceof Nette\Forms\IControl) {
 									$condition = $condition->addConditionOn(
 										$uniqueControl,

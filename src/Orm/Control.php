@@ -44,7 +44,7 @@ abstract class Control
 					$this->entity->getValue($key),
 					is_array(
 						static::$itemsPerPage
-					) ? (isset(static::$itemsPerPage[$key]) ? static::$itemsPerPage[$key] : self::$itemsPerPage) : static::$itemsPerPage
+					) ? (static::$itemsPerPage[$key] ?? self::$itemsPerPage) : static::$itemsPerPage
 				);
 				if ($this->storage) {
 					$control->setCacheStorage($this->storage);
