@@ -56,8 +56,7 @@ class Parser
 		$this->parsingRelationship = TRUE;
 		$relationshipMetadata = $this->parseMetadata(
 			$propertyMetadata->relationship->entity,
-			$fileDependencies,
-			FALSE
+			$fileDependencies
 		);
 		$this->parsingRelationship = FALSE;
 		if ( ! $relationshipMetadata->hasProperty($propertyMetadata->relationship->property)) {
