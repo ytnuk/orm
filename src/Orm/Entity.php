@@ -58,7 +58,7 @@ abstract class Entity
 	{
 		return [
 			static::class,
-			$this->id,
+			$this->getPersistedId(),
 		];
 	}
 

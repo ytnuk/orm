@@ -108,14 +108,6 @@ abstract class Container
 		}
 	}
 
-	public function lookupSelf(bool $need = TRUE)
-	{
-		return $this->lookup(
-			self::class,
-			$need
-		);
-	}
-
 	protected function attached($form)
 	{
 		parent::attached($form);
@@ -207,7 +199,10 @@ abstract class Container
 				$delimiter
 			);
 		}
-		$parent = $this->lookupSelf(FALSE);
+		$parent = $this->lookup(
+			self::class,
+			FALSE
+		);
 		foreach (
 			$properties as $metadata
 		) {
@@ -217,7 +212,7 @@ abstract class Container
 			)) {
 				continue;
 			}
-			if ($path && $parent && is_subclass_of(
+			if ($path && $parent instanceof self && is_subclass_of(
 					$metadata->container,
 					Nextras\Orm\Relationships\HasOne::class
 				)
@@ -356,11 +351,13 @@ abstract class Container
 			);
 		}
 		$items = self::$manyHasOneItems[$metadata->relationship->repository];
-		if ($container = $this->lookupSelf(FALSE)) {
-			if ($container->getRepository() === $repository && $entity = $container->getEntity()) {
-				if ($entity->id) {
-					unset($items[$entity->id]);
-				}
+		$container = $this->lookup(
+			self::class,
+			FALSE
+		);
+		if ($container instanceof self && $container->getRepository() === $repository && $entity = $container->getEntity()) {
+			if ($id = $entity->getPersistedId()) {
+				unset($items[$id]);
 			}
 		}
 

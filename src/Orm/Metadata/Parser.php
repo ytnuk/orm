@@ -28,14 +28,16 @@ class Parser
 			),
 			$fileDependencies,
 		]);
-		foreach (
-			$metadata->getProperties() as $property
-		) {
-			$this->parseRelationshipPropertyMetadata(
-				$class,
-				$fileDependencies,
-				$property
-			);
+		if ($metadata instanceof Nextras\Orm\Entity\Reflection\EntityMetadata) {
+			foreach (
+				$metadata->getProperties() as $property
+			) {
+				$this->parseRelationshipPropertyMetadata(
+					$class,
+					$fileDependencies,
+					$property
+				);
+			}
 		}
 
 		return $metadata;

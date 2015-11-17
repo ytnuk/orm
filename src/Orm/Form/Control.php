@@ -37,7 +37,7 @@ abstract class Control
 				case $form['action']['add']:
 					$presenter->redirect(
 						'Presenter:edit',
-						$this->entity->id
+						$this->entity->getPersistedId()
 					);
 					break;
 				case $form['action']['edit']:

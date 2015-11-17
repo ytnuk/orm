@@ -145,7 +145,8 @@ final class Form
 		$message = [
 			parent::formatFlashMessage($type),
 		];
-		if ($this->submitted instanceof Nette\Forms\Controls\Button && $this->submitted->getParent() === $this['action']) {
+		$submitted = $this->isSubmitted();
+		if ($submitted instanceof Nette\ComponentModel\Component && $submitted->getParent() === $this['action']) {
 			array_unshift(
 				$message,
 				'orm'
@@ -160,7 +161,7 @@ final class Form
 
 	protected function getControl() : Nette\Application\UI\Control
 	{
-		switch ($this->submitted) {
+		switch ($this->isSubmitted()) {
 			case $this['action']['delete']:
 				return $this->getPresenter();
 		}
