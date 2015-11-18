@@ -41,7 +41,7 @@ abstract class Control
 					);
 					break;
 				case $form['action']['edit']:
-					$presenter->forward('this');
+					$presenter->redirect('this#' . $this->getSnippetId());
 					break;
 				case $form['action']['delete']:
 					$presenter->redirect('Presenter:list');
