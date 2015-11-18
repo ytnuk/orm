@@ -3,6 +3,7 @@ namespace Ytnuk\Orm;
 
 use Nette;
 use Nextras;
+use VojtechDobes;
 use Ytnuk;
 
 abstract class Control
@@ -12,7 +13,7 @@ abstract class Control
 	/**
 	 * @var int|array
 	 */
-	protected static $itemsPerPage = 10;
+	protected static $itemsPerPage = 2;
 
 	/**
 	 * @var Nextras\Orm\Entity\IEntity
@@ -24,6 +25,11 @@ abstract class Control
 	 */
 	private $storage;
 
+	/**
+	 * @var VojtechDobes\NetteAjax\OnResponseHandler
+	 */
+	private $onResponseHandler;
+
 	public function __construct(Nextras\Orm\Entity\IEntity $entity)
 	{
 		parent::__construct();
@@ -34,6 +40,12 @@ abstract class Control
 	{
 		parent::setCacheStorage($storage);
 		$this->storage = $storage;
+	}
+
+	public function setOnResponseHandler(VojtechDobes\NetteAjax\OnResponseHandler $onResponseHandler)
+	{
+		parent::setOnResponseHandler($onResponseHandler);
+		$this->onResponseHandler = $onResponseHandler;
 	}
 
 	protected function createComponentPagination() : Nette\Application\UI\Multiplier
@@ -48,6 +60,9 @@ abstract class Control
 				);
 				if ($this->storage) {
 					$control->setCacheStorage($this->storage);
+				}
+				if ($this->onResponseHandler) {
+					$control->setOnResponseHandler($this->onResponseHandler);
 				}
 
 				return $control;
