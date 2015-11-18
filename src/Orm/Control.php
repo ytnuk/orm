@@ -13,7 +13,7 @@ abstract class Control
 	/**
 	 * @var int|array
 	 */
-	protected static $itemsPerPage = 2;
+	protected static $itemsPerPage = 10;
 
 	/**
 	 * @var Nextras\Orm\Entity\IEntity
