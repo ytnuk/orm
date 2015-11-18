@@ -108,6 +108,7 @@ class Parser
 			$relationshipProperty->container = $relationshipContainer;
 			$relationshipProperty->relationship->isMain = $relationshipIsMain;
 			$relationshipProperty->relationship->property = $propertyMetadata->name;
+			$relationshipProperty->relationship->cascade = $propertyMetadata->relationship->cascade;
 			$relationshipProperty->isNullable = TRUE;
 			if ($relationshipProperty->relationship->repository = $this->entityClassesMap[$class] ?? NULL) {
 				$relationshipProperty->relationship->entity = $class;
