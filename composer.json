@@ -1,5 +1,6 @@
 {
 	"name": "ytnuk/orm",
+	"type": "ytnuk/module",
 	"require": {
 		"nextras/orm": "dev-master",
 		"ytnuk/grid": "dev-master",
