@@ -2,11 +2,16 @@
 	"name": "ytnuk/orm",
 	"extra": {
 		"extensions": {
-			"ytnuk_orm": "Ytnuk\\Orm\\Extension"
+			"ytnuk.orm": "Ytnuk\\Orm\\Extension",
+			"nextras.dbal": "Nextras\\Dbal\\Bridges\\NetteDI\\DbalExtension"
+		},
+		"nextras.dbal": {
+			"driver": "pgsql"
 		}
 	},
 	"require": {
 		"nextras/orm": "dev-master",
+		"nextras/dbal": "dev-master",
 		"ytnuk/grid": "dev-master",
 		"ytnuk/form": "dev-master",
 		"ytnuk/pagination": "dev-master"
