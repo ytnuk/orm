@@ -3,7 +3,7 @@ namespace Ytnuk\Orm\Metadata;
 
 use Nextras;
 
-class Parser
+final class Parser
 	extends Nextras\Orm\Entity\Reflection\MetadataParser
 {
 

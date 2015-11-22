@@ -4,7 +4,7 @@ namespace Ytnuk\Orm\Metadata\Parser;
 use Nextras;
 use Ytnuk;
 
-class Factory
+final class Factory
 	implements Nextras\Orm\Entity\Reflection\IMetadataParserFactory
 {
 

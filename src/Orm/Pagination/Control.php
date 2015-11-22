@@ -6,7 +6,7 @@ use Nette;
 use Nextras;
 use Ytnuk;
 
-class Control
+final class Control
 	extends Ytnuk\Pagination\Control
 {
 
