@@ -1,5 +1,10 @@
 {
 	"name": "ytnuk/orm",
+	"extra": {
+		"extensions": {
+			"ytnuk/orm": "Ytnuk\\Orm\\Extension"
+		}
+	},
 	"require": {
 		"nextras/orm": "dev-master",
 		"ytnuk/grid": "dev-master",
