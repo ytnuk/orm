@@ -2,7 +2,7 @@
 	"name": "ytnuk/orm",
 	"extra": {
 		"extensions": {
-			"ytnuk/orm": "Ytnuk\\Orm\\Extension"
+			"ytnuk_orm": "Ytnuk\\Orm\\Extension"
 		}
 	},
 	"require": {
