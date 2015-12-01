@@ -44,11 +44,11 @@ final class Form
 		$container = $this->getComponent('this');
 		if ($container instanceof Form\Container) {
 			switch ($form->isSubmitted()) {
-				case $this['action-add']:
-				case $this['action-edit']:
+				case $this['action']['add']:
+				case $this['action']['edit']:
 					$container->persistEntity();
 					break;
-				case $this['action-delete']:
+				case $this['action']['delete']:
 					$container->removeEntity();
 					break;
 			}
@@ -162,7 +162,7 @@ final class Form
 	protected function getControl() : Nette\Application\UI\Control
 	{
 		switch ($this->isSubmitted()) {
-			case $this['action-delete']:
+			case $this['action']['delete']:
 				return $this->getPresenter();
 		}
 
