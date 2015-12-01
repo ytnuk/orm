@@ -3,6 +3,7 @@ namespace Ytnuk\Orm;
 
 use Kdyby;
 use Nette;
+use Nextras;
 use SplObjectStorage;
 use Ytnuk;
 
@@ -11,28 +12,22 @@ final class Form
 {
 
 	/**
-	 * @var Entity
+	 * @var Nextras\Orm\Entity\IEntity
 	 */
 	private $entity;
 
 	/**
-	 * @var Model
+	 * @var Nextras\Orm\Model\IModel
 	 */
 	private $model;
 
-	/**
-	 * @var Repository
-	 */
-	private $repository;
-
 	public function __construct(
-		Entity $entity,
-		Model $model
+		Nextras\Orm\Entity\IEntity $entity,
+		Nextras\Orm\Model\IModel $model
 	) {
 		parent::__construct();
 		$this->entity = $entity;
 		$this->model = $model;
-		$this->repository = $model->getRepositoryForEntity($entity);
 		$this->onSuccess[] = [
 			$this,
 			'success',
@@ -125,7 +120,7 @@ final class Form
 
 	protected function createComponent($name)
 	{
-		if ($name instanceof Entity) {
+		if ($name instanceof Nextras\Orm\Entity\IEntity) {
 			$class = rtrim(
 					$name->getMetadata()->getClassName(),
 					'a..zA..Z'

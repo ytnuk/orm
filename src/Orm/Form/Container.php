@@ -16,12 +16,12 @@ abstract class Container
 	private static $manyHasOneItems = [];
 
 	/**
-	 * @var Ytnuk\Orm\Entity
+	 * @var Nextras\Orm\Entity\IEntity
 	 */
 	private $entity;
 
 	/**
-	 * @var Ytnuk\Orm\Repository
+	 * @var Nextras\Orm\Repository\IRepository
 	 */
 	private $repository;
 
@@ -31,23 +31,23 @@ abstract class Container
 	private $metadata;
 
 	/**
-	 * @var Ytnuk\Orm\Mapper
+	 * @var Nextras\Orm\Mapper\IMapper
 	 */
 	private $mapper;
 
 	/**
-	 * @var Ytnuk\Orm\Model
+	 * @var Nextras\Orm\Model\IModel
 	 */
 	private $model;
 
 	/**
-	 * @var Ytnuk\Orm\Entity[]
+	 * @var Nextras\Orm\Entity\IEntity[]
 	 */
 	private $relations = [];
 
 	public function __construct(
-		Ytnuk\Orm\Entity $entity,
-		Ytnuk\Orm\Repository $repository
+		Nextras\Orm\Entity\IEntity $entity,
+		Nextras\Orm\Repository\IRepository $repository
 	) {
 		parent::__construct();
 		$this->entity = $entity;
@@ -59,12 +59,12 @@ abstract class Container
 		$repository->attach($entity);
 	}
 
-	public function getEntity() : Ytnuk\Orm\Entity
+	public function getEntity() : Nextras\Orm\Entity\IEntity
 	{
 		return $this->entity;
 	}
 
-	public function getRepository() : Ytnuk\Orm\Repository
+	public function getRepository() : Nextras\Orm\Repository\IRepository
 	{
 		return $this->repository;
 	}

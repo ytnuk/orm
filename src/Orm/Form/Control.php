@@ -1,6 +1,7 @@
 <?php
 namespace Ytnuk\Orm\Form;
 
+use Nextras;
 use Ytnuk;
 
 abstract class Control
@@ -8,7 +9,7 @@ abstract class Control
 {
 
 	/**
-	 * @var Ytnuk\Orm\Entity
+	 * @var Nextras\Orm\Entity\IEntity
 	 */
 	private $entity;
 
@@ -17,9 +18,9 @@ abstract class Control
 	 */
 	private $form;
 
-	//TODO: is Ytnuk\Orm\Entity required instead of IEntity?
+	//TODO: is Ytnuk\Orm\Entity required instead of IEntity? (NO! replace it) + Repository in form / container
 	public function __construct(
-		Ytnuk\Orm\Entity $entity,
+		Nextras\Orm\Entity\IEntity $entity,
 		Factory $form
 	) {
 		parent::__construct($entity);

@@ -1,6 +1,7 @@
 <?php
 namespace Ytnuk\Orm\Grid;
 
+use Nextras;
 use Ytnuk;
 
 final class Control
@@ -8,7 +9,7 @@ final class Control
 {
 
 	/**
-	 * @var Ytnuk\Orm\Repository
+	 * @var Nextras\Orm\Repository\IRepository
 	 */
 	private $repository;
 
@@ -18,7 +19,7 @@ final class Control
 	private $form;
 
 	public function __construct(
-		Ytnuk\Orm\Repository $repository,
+		Nextras\Orm\Repository\IRepository $repository,
 		Ytnuk\Orm\Form\Factory $form
 	) {
 		parent::__construct();
@@ -29,7 +30,7 @@ final class Control
 	protected function createComponentGrid() : Ytnuk\Grid\Control
 	{
 		$grid = new Ytnuk\Grid\Control(
-			function (Ytnuk\Orm\Entity $entity = NULL) {
+			function (Nextras\Orm\Entity\IEntity $entity = NULL) {
 				if ( ! $entity) {
 					$entityClass = $this->repository->getEntityMetadata()->getClassName();
 					$entity = new $entityClass;

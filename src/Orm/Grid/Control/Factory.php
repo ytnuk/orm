@@ -1,10 +1,11 @@
 <?php
 namespace Ytnuk\Orm\Grid\Control;
 
+use Nextras;
 use Ytnuk;
 
 interface Factory
 {
 
-	public function create(Ytnuk\Orm\Repository $repository) : Ytnuk\Orm\Grid\Control;
+	public function create(Nextras\Orm\Repository\IRepository $repository) : Ytnuk\Orm\Grid\Control;
 }
