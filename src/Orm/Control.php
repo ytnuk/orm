@@ -33,6 +33,12 @@ abstract class Control
 	public function setEntity(Nextras\Orm\Entity\IEntity $entity)
 	{
 		$this->entity = $entity;
+		array_walk(
+			iterator_to_array($this->getComponents()),
+			function (Nette\ComponentModel\IComponent $component) {
+				$this->removeComponent($component);
+			}
+		);
 	}
 
 	public function setCacheStorage(Nette\Caching\IStorage $storage)
