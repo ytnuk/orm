@@ -7,8 +7,6 @@ final class Control
 	extends Ytnuk\Application\Control
 {
 
-	const NAME = 'grid';
-
 	/**
 	 * @var Ytnuk\Orm\Repository
 	 */

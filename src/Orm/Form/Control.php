@@ -7,8 +7,6 @@ abstract class Control
 	extends Ytnuk\Orm\Control
 {
 
-	const NAME = 'form';
-
 	/**
 	 * @var Ytnuk\Orm\Entity
 	 */
@@ -40,16 +38,16 @@ abstract class Control
 		$form->onSuccess[] = function (Ytnuk\Orm\Form $form) {
 			$presenter = $this->getPresenter();
 			switch ($form->isSubmitted()) {
-				case $form['action']['add']:
+				case $form['action-add']:
 					$presenter->redirect(
 						'Presenter:edit',
 						$this->entity->getPersistedId()
 					);
 					break;
-				case $form['action']['edit']:
+				case $form['action-edit']:
 					$presenter->redirect('this#' . $this->getSnippetId());
 					break;
-				case $form['action']['delete']:
+				case $form['action-delete']:
 					$presenter->redirect('Presenter:list');
 					break;
 			}
