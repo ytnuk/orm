@@ -18,7 +18,6 @@ abstract class Control
 	 */
 	private $form;
 
-	//TODO: is Ytnuk\Orm\Entity required instead of IEntity? (NO! replace it) + Repository in form / container
 	public function __construct(
 		Nextras\Orm\Entity\IEntity $entity,
 		Factory $form
