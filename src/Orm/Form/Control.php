@@ -27,11 +27,6 @@ abstract class Control
 		$this->form = $form;
 	}
 
-	public function setEntity(Ytnuk\Orm\Entity $entity)
-	{
-		$this->entity = $entity;
-	}
-
 	protected function createComponentForm() : Ytnuk\Orm\Form
 	{
 		$form = $this->form->create($this->entity);

@@ -30,6 +30,11 @@ abstract class Control
 		$this->entity = $entity;
 	}
 
+	public function setEntity(Nextras\Orm\Entity\IEntity $entity)
+	{
+		$this->entity = $entity;
+	}
+
 	public function setCacheStorage(Nette\Caching\IStorage $storage)
 	{
 		parent::setCacheStorage($storage);
