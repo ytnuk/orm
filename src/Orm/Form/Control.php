@@ -19,6 +19,7 @@ abstract class Control
 	 */
 	private $form;
 
+	//TODO: is Ytnuk\Orm\Entity required instead of IEntity?
 	public function __construct(
 		Ytnuk\Orm\Entity $entity,
 		Factory $form
@@ -26,6 +27,11 @@ abstract class Control
 		parent::__construct($entity);
 		$this->entity = $entity;
 		$this->form = $form;
+	}
+
+	public function setEntity(Ytnuk\Orm\Entity $entity)
+	{
+		$this->entity = $entity;
 	}
 
 	protected function createComponentForm() : Ytnuk\Orm\Form
