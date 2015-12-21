@@ -11,7 +11,6 @@
 	},
 	"require": {
 		"nextras/orm": "dev-master",
-		"nextras/dbal": "dev-master",
 		"ytnuk/grid": "dev-master",
 		"ytnuk/form": "dev-master",
 		"ytnuk/pagination": "dev-master"
