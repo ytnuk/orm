@@ -16,7 +16,6 @@ final class Extension
 	private $defaults = [
 		'model' => Model::class,
 		'repositories' => [],
-		'metadataParserFactory' => Metadata\Parser\Factory::class,
 	];
 
 	public function getTranslationResources() : array
