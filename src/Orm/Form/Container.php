@@ -276,7 +276,7 @@ abstract class Container
 					) => TRUE,
 				]) as $type => $value
 		) {
-			$method = 'addProperty' . ucfirst($type);
+			$method = 'createComponent' . ucfirst($type);
 			if ( ! method_exists(
 				$this,
 				$method
@@ -321,7 +321,7 @@ abstract class Container
 		);
 	}
 
-	protected function addPropertyOneHasOne(
+	protected function createComponentOneHasOne(
 		Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata,
 		bool $force = FALSE
 	) {
@@ -342,7 +342,7 @@ abstract class Container
 		);
 	}
 
-	protected function addPropertyManyHasOne(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata) : Nette\Forms\Controls\SelectBox
+	protected function createComponentManyHasOne(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata) : Nette\Forms\Controls\SelectBox
 	{
 		$repository = $this->model->getRepository($metadata->relationship->repository);
 		if ( ! isset(self::$manyHasOneItems[$metadata->relationship->repository])) {
@@ -390,7 +390,7 @@ abstract class Container
 		);
 	}
 
-	protected function addPropertyOneHasMany(
+	protected function createComponentOneHasMany(
 		Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata,
 		int $forceDefault = 0
 	) : Kdyby\Replicator\Container
@@ -588,12 +588,12 @@ abstract class Container
 		);
 	}
 
-	protected function addPropertyInt(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata) : Nette\Forms\Controls\TextInput
+	protected function createComponentInt(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata) : Nette\Forms\Controls\TextInput
 	{
-		return $this->addPropertyString($metadata)->setType('number');
+		return $this->createComponentString($metadata)->setType('number');
 	}
 
-	protected function addPropertyString(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata) : Nette\Forms\Controls\TextInput
+	protected function createComponentString(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata) : Nette\Forms\Controls\TextInput
 	{
 		return $this->addText(
 			$metadata->name,
@@ -601,7 +601,7 @@ abstract class Container
 		);
 	}
 
-	protected function addPropertyBool(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata) : Nette\Forms\Controls\Checkbox
+	protected function createComponentBool(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata) : Nette\Forms\Controls\Checkbox
 	{
 		return $this->addCheckbox(
 			$metadata->name,
@@ -621,7 +621,12 @@ abstract class Container
 			FALSE
 		);
 		if ($presenter instanceof Nette\Application\UI\Presenter) {
-			$template = $presenter->getTemplateFactory()->createTemplate();
+			$template = $presenter->getTemplateFactory()->createTemplate(
+				$form->lookup(
+					Nette\Application\UI\Control::class,
+					FALSE
+				)
+			);
 			if ( ! $template instanceof Nette\Bridges\ApplicationLatte\Template) {
 				return NULL;
 			}
