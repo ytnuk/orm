@@ -74,7 +74,7 @@ abstract class Container
 		return $this->metadata;
 	}
 
-	public function persistEntity(bool $flush = TRUE)
+	public function persistEntity(bool $flush = FALSE)
 	{
 		$this->setValues($this->getValues());
 		$this->repository->persist($this->entity);
@@ -97,7 +97,7 @@ abstract class Container
 		return $this->relations;
 	}
 
-	public function removeEntity(bool $flush = TRUE)
+	public function removeEntity(bool $flush = FALSE)
 	{
 		$this->repository->remove(
 			$this->entity,
@@ -429,7 +429,7 @@ abstract class Container
 							Kdyby\Replicator\Container $replicator,
 							self $container
 						) {
-							$container->removeEntity();
+							$container->removeEntity(TRUE);
 						}
 					);
 				}

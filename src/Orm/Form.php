@@ -40,10 +40,10 @@ final class Form
 			switch ($form->isSubmitted()) {
 				case $this['action']['add']:
 				case $this['action']['edit']:
-					$container->persistEntity();
+					$container->persistEntity(TRUE);
 					break;
 				case $this['action']['delete']:
-					$container->removeEntity();
+					$container->removeEntity(TRUE);
 					break;
 			}
 		}
