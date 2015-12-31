@@ -4,7 +4,6 @@ namespace Ytnuk\Orm;
 use Kdyby;
 use Nette;
 use Nextras;
-use SplObjectStorage;
 use Ytnuk;
 
 final class Form
@@ -50,23 +49,6 @@ final class Form
 		}
 	}
 
-	public function addGroup(
-		$caption = NULL,
-		$setAsCurrent = TRUE
-	) : Nette\Forms\ControlGroup
-	{
-		$group = parent::addGroup(
-			NULL,
-			$setAsCurrent
-		);
-		$group->setOption(
-			'label',
-			$caption
-		);
-
-		return $group;
-	}
-
 	protected function attached($control)
 	{
 		parent::attached($control);
@@ -88,34 +70,6 @@ final class Form
 			'delete',
 			'orm.form.action.delete.label'
 		)->setValidationScope(FALSE)->setDisabled(! $this->entity->isPersisted());
-		$controlGroupReflection = Nette\Reflection\ClassType::from('Nette\Forms\ControlGroup');
-		$controlsProperty = $controlGroupReflection->getProperty('controls');
-		$controlsProperty->setAccessible(TRUE);
-		do {
-			$detached = FALSE;
-			foreach (
-				$this->getGroups() as $group
-			) {
-				$controls = $controlsProperty->getValue($group);
-				if ($controls instanceof SplObjectStorage) {
-					foreach (
-						$controls as $control
-					) {
-						if ($control instanceof Nette\ComponentModel\Component && ! $control->lookup(
-								Nette\Forms\Form::class,
-								FALSE
-							)
-						) {
-							$detached = TRUE;
-							$controls->detach($control);
-						}
-					}
-					if ( ! count($controls)) {
-						$this->removeGroup($group);
-					}
-				}
-			}
-		} while ($detached);
 	}
 
 	protected function createComponent($name)

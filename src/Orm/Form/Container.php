@@ -395,18 +395,11 @@ abstract class Container
 		int $forceDefault = 0
 	) : Kdyby\Replicator\Container
 	{
-		$this->setCurrentGroup(
-			$this->getForm()->addGroup(
-				$this->prefixPropertyGroup($metadata),
-				FALSE
-			)
-		);
 		$repository = $this->model->getRepository($metadata->relationship->repository);
 		$collection = $this->entity->getValue($metadata->name)->get()->fetchPairs(
 			current($repository->getEntityMetadata()->getPrimaryKey())
 		);
-		$replicator = $this->addDynamic(
-			$metadata->name,
+		$replicator = new Kdyby\Replicator\Container(
 			function (Nette\Forms\Container $container) use
 			(
 				$metadata,
@@ -442,6 +435,27 @@ abstract class Container
 				}
 			}
 		);
+		$add = $replicator->addSubmit(
+			'add',
+			$this->formatPropertyAction(
+				$metadata,
+				'add'
+			)
+		);
+		call_user_func(
+			[
+				$add,
+				'addCreateOnClick',
+			]
+		);
+		$add->setValidationScope([$replicator]);
+		$replicator->setCurrentGroup(
+			($this->getForm()->addGroup(
+				$this->prefixPropertyGroup($metadata),
+				FALSE
+			)->add($add))
+		);
+		$this[$metadata->name] = $replicator;
 		if ($createDefault = max(
 			count($collection),
 			$forceDefault
@@ -459,16 +473,6 @@ abstract class Container
 				}
 			}
 		}
-		$add = $replicator->addSubmit(
-			'add',
-			$this->formatPropertyAction(
-				$metadata,
-				'add'
-			)
-		);
-		$add->setValidationScope([$replicator]);
-		$add->addCreateOnClick();
-		$replicator->getCurrentGroup()->add($add);
 		if ($add->isSubmittedBy()) {
 			$isValid = TRUE;
 			if ($scope = $add->getValidationScope()) {
@@ -603,5 +607,35 @@ abstract class Container
 			$metadata->name,
 			$this->formatPropertyLabel($metadata)
 		);
+	}
+
+	protected function render(
+		Nette\Forms\Form $form,
+		string $file = NULL
+	) {
+		if ( ! $file) {
+			return NULL;
+		}
+		$presenter = $form->lookup(
+			Nette\Application\UI\Presenter::class,
+			FALSE
+		);
+		if ($presenter instanceof Nette\Application\UI\Presenter) {
+			$template = $presenter->getTemplateFactory()->createTemplate();
+			if ( ! $template instanceof Nette\Bridges\ApplicationLatte\Template) {
+				return NULL;
+			}
+			$template->setFile($file);
+			$template->setParameters(
+				[
+					'form' => $form,
+					'_form' => $this,
+				]
+			);
+
+			return (string) $template;
+		}
+
+		return NULL;
 	}
 }
