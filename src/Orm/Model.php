@@ -20,20 +20,14 @@ final class Model
 		Nextras\Orm\Model\MetadataStorage $metadataStorage,
 		Nette\Caching\IStorage $cacheStorage
 	) {
-		parent::__construct(
-			$configuration,
-			$repositoryLoader,
-			$metadataStorage
-		);
+		parent::__construct($configuration, $repositoryLoader, $metadataStorage);
 		$this->onFlush[] = function () use
 		(
 			$cacheStorage
 		) {
-			$cacheStorage->clean(
-				[
-					Nette\Caching\Cache::TAGS => $this->tags,
-				]
-			);
+			$cacheStorage->clean([
+				Nette\Caching\Cache::TAGS => $this->tags,
+			]);
 			$this->tags = [];
 		};
 	}
@@ -41,10 +35,7 @@ final class Model
 	public function processEntityCache(Nextras\Orm\Entity\IEntity $entity)
 	{
 		if ($entity instanceof Entity && $entity->isPersisted()) {
-			$this->tags = array_merge(
-				$this->tags,
-				$entity->getCacheTags(TRUE)
-			);
+			$this->tags = array_merge($this->tags, $entity->getCacheTags(TRUE));
 		}
 	}
 }

@@ -10,10 +10,7 @@ abstract class Mapper
 	public function getTableName() : string
 	{
 		if ( ! $this->tableName) {
-			$namespace = explode(
-				'\\',
-				$this->getReflection()->getNamespaceName()
-			);
+			$namespace = explode('\\', $this->getReflection()->getNamespaceName());
 			array_shift($namespace);
 			$this->tableName = Nextras\Orm\StorageReflection\StringHelper::underscore(implode($namespace));
 		}

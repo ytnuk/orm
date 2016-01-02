@@ -88,10 +88,7 @@ abstract class Container
 		foreach (
 			$this->relations as $property => $value
 		) {
-			$this->entity->setValue(
-				$property,
-				$value
-			);
+			$this->entity->setValue($property, $value);
 		}
 
 		return $this->relations;
@@ -99,10 +96,7 @@ abstract class Container
 
 	public function removeEntity(bool $flush = FALSE)
 	{
-		$this->repository->remove(
-			$this->entity,
-			TRUE
-		);
+		$this->repository->remove($this->entity, TRUE);
 		if ($flush) {
 			$this->repository->flush();
 		}
@@ -134,93 +128,49 @@ abstract class Container
 		) {
 			if ($this[$property] instanceof Nette\Forms\IControl) {
 				$value = $value === '' ? NULL : $value;
-				if ($this[$property] instanceof Nette\Forms\Controls\Checkbox && ! $value && $this->metadata->getProperty(
-						$property
-					)->isNullable
-				) {
+				if ($this[$property] instanceof Nette\Forms\Controls\Checkbox && ! $value && $this->metadata->getProperty($property)->isNullable) {
 					$value = NULL;
 				}
-				$this->entity->setValue(
-					$property,
-					$value
-				);
+				$this->entity->setValue($property, $value);
 			}
 		}
 
-		return parent::setValues(
-			$values,
-			$erase
-		);
+		return parent::setValues($values, $erase);
 	}
 
 	protected function prefixContainer(string $string) : string
 	{
-		return $this->prefix(
-			implode(
-				'.',
-				[
-					'form',
-					'container',
-					$string,
-				]
-			)
-		);
+		return $this->prefix(implode('.', [
+			'form',
+			'container',
+			$string,
+		]));
 	}
 
 	protected function prefix(string $string) : string
 	{
-		return implode(
-			'.',
-			[
-				str_replace(
-					'_',
-					'.',
-					$this->mapper->getTableName()
-				),
-				$string,
-			]
-		);
+		return implode('.', [
+			str_replace('_', '.', $this->mapper->getTableName()),
+			$string,
+		]);
 	}
 
 	protected function addProperties(array $properties)
 	{
-		$path = $this->lookupPath(
-			self::class,
-			FALSE
-		);
-		$delimiter = strpos(
-			$path,
-			'-'
-		);
+		$path = $this->lookupPath(self::class, FALSE);
+		$delimiter = strpos($path, '-');
 		if ($delimiter !== FALSE) {
-			$path = substr(
-				$path,
-				0,
-				$delimiter
-			);
+			$path = substr($path, 0, $delimiter);
 		}
-		$parent = $this->lookup(
-			self::class,
-			FALSE
-		);
+		$parent = $this->lookup(self::class, FALSE);
 		foreach (
 			$properties as $metadata
 		) {
-			if (in_array(
-				$metadata->name,
-				$this->metadata->getPrimaryKey()
-			)) {
+			if (in_array($metadata->name, $this->metadata->getPrimaryKey())) {
 				continue;
 			}
-			if ($path && $parent instanceof self && is_subclass_of(
-					$metadata->container,
-					Nextras\Orm\Relationships\HasOne::class
-				)
-			) {
-				if ($metadata->relationship && $metadata->relationship->property === $path && $metadata->relationship->repository === get_class(
-						$parent->getRepository()
-					)
-				) {
+			if ($path && $parent instanceof self && is_subclass_of($metadata->container, Nextras\Orm\Relationships\HasOne::class)) {
+				if ($metadata->relationship && $metadata->relationship->property === $path && $metadata->relationship->repository === get_class($parent->getRepository())) {
 					$this->relations[$metadata->name] = $parent->getEntity();
 					continue;
 				}
@@ -239,18 +189,12 @@ abstract class Container
 				}
 				$component->setDisabled($metadata->isReadonly);
 				$component->setDefaultValue($this->entity->getRawValue($metadata->name));
-				$component->setAttribute(
-					'placeholder',
-					$this->formatPropertyPlaceholder($metadata)
-				);
+				$component->setAttribute('placeholder', $this->formatPropertyPlaceholder($metadata));
 				break;
 			case $component instanceof Nette\ComponentModel\IContainer:
 				if ($metadata->isReadonly) {
 					foreach (
-						$component->getComponents(
-							TRUE,
-							Nette\Forms\Controls\BaseControl::class
-						) as $control
+						$component->getComponents(TRUE, Nette\Forms\Controls\BaseControl::class) as $control
 					) {
 						$value = $control->getValue();
 						$control->setDisabled();
@@ -267,31 +211,18 @@ abstract class Container
 	{
 		foreach (
 			[$metadata->name => TRUE] + ($metadata->isVirtual ? [] : $metadata->types + [
-					substr(
-						$metadata->container,
-						strrpos(
-							$metadata->container,
-							'\\'
-						) + 1
-					) => TRUE,
+					substr($metadata->container, strrpos($metadata->container, '\\') + 1) => TRUE,
 				]) as $type => $value
 		) {
 			$method = 'createComponent' . ucfirst($type);
-			if ( ! method_exists(
-				$this,
-				$method
-			)
-			) {
+			if ( ! method_exists($this, $method)) {
 				continue;
 			}
 
-			return call_user_func(
-				[
-					$this,
-					$method,
-				],
-				$metadata
-			);
+			return call_user_func([
+				$this,
+				$method,
+			], $metadata);
 		}
 
 		return NULL;
@@ -299,26 +230,18 @@ abstract class Container
 
 	protected function formatPropertyPlaceholder(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata) : string
 	{
-		return implode(
-			'.',
-			[
-				$this->prefixProperty($metadata),
-				'placeholder',
-			]
-		);
+		return implode('.', [
+			$this->prefixProperty($metadata),
+			'placeholder',
+		]);
 	}
 
 	protected function prefixProperty(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata) : string
 	{
-		return $this->prefixContainer(
-			implode(
-				'.',
-				[
-					'property',
-					$metadata->name,
-				]
-			)
-		);
+		return $this->prefixContainer(implode('.', [
+			'property',
+			$metadata->name,
+		]));
 	}
 
 	protected function createComponentOneHasOne(
@@ -336,58 +259,40 @@ abstract class Container
 			$entity = new $relationshipEntityClass;
 		}
 
-		return $this->addComponent(
-			$this->form->createComponent($entity),
-			$metadata->name
-		);
+		return $this->addComponent($this->form->createComponent($entity), $metadata->name);
 	}
 
 	protected function createComponentManyHasOne(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata) : Nette\Forms\Controls\SelectBox
 	{
 		$repository = $this->model->getRepository($metadata->relationship->repository);
 		if ( ! isset(self::$manyHasOneItems[$metadata->relationship->repository])) {
-			self::$manyHasOneItems[$metadata->relationship->repository] = $repository->findAll()->fetchPairs(
-				current($repository->getEntityMetadata()->getPrimaryKey())
-			);
+			self::$manyHasOneItems[$metadata->relationship->repository] = $repository->findAll()->fetchPairs(current($repository->getEntityMetadata()->getPrimaryKey()));
 		}
 		$items = self::$manyHasOneItems[$metadata->relationship->repository];
-		$container = $this->lookup(
-			self::class,
-			FALSE
-		);
+		$container = $this->lookup(self::class, FALSE);
 		if ($container instanceof self && $container->getRepository() === $repository && $entity = $container->getEntity()) {
 			if ($id = $entity->getPersistedId()) {
 				unset($items[$id]);
 			}
 		}
 
-		return $this->addSelect(
-			$metadata->name,
-			$this->formatPropertyLabel($metadata),
-			$items
-		)->setPrompt($this->formatPropertyPrompt($metadata));
+		return $this->addSelect($metadata->name, $this->formatPropertyLabel($metadata), $items)->setPrompt($this->formatPropertyPrompt($metadata));
 	}
 
 	protected function formatPropertyLabel(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata) : string
 	{
-		return implode(
-			'.',
-			[
-				$this->prefixProperty($metadata),
-				'label',
-			]
-		);
+		return implode('.', [
+			$this->prefixProperty($metadata),
+			'label',
+		]);
 	}
 
 	protected function formatPropertyPrompt(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata) : string
 	{
-		return implode(
-			'.',
-			[
-				$this->prefixProperty($metadata),
-				'placeholder',
-			]
-		);
+		return implode('.', [
+			$this->prefixProperty($metadata),
+			'placeholder',
+		]);
 	}
 
 	protected function createComponentOneHasMany(
@@ -396,71 +301,39 @@ abstract class Container
 	) : Kdyby\Replicator\Container
 	{
 		$repository = $this->model->getRepository($metadata->relationship->repository);
-		$collection = $this->entity->getValue($metadata->name)->get()->fetchPairs(
-			current($repository->getEntityMetadata()->getPrimaryKey())
-		);
-		$replicator = new Kdyby\Replicator\Container(
-			function (Nette\Forms\Container $container) use
-			(
-				$metadata,
-				$repository,
-				$collection
-			) {
-				$replicator = $container->parent;
-				$name = $container->getName();
-				unset($container->parent[$name]);
-				if ( ! $entity = $collection[$name] ?? NULL) {
-					$entityClassName = $repository->getEntityMetadata()->getClassName();
-					$entity = new $entityClassName;
-				}
-				$replicator->addComponent(
-					$container = $this->form->createComponent($entity),
-					$name
-				);
-				if ($container instanceof Nette\Forms\Container) {
-					$container->addSubmit(
-						'delete',
-						$this->formatPropertyAction(
-							$metadata,
-							'delete'
-						)
-					)->addRemoveOnClick(
-						function (
-							Kdyby\Replicator\Container $replicator,
-							self $container
-						) {
-							$container->removeEntity(TRUE);
-						}
-					);
-				}
-			}
-		);
-		$add = $replicator->addSubmit(
-			'add',
-			$this->formatPropertyAction(
-				$metadata,
-				'add'
-			)
-		);
-		call_user_func(
-			[
-				$add,
-				'addCreateOnClick',
-			]
-		);
-		$add->setValidationScope([$replicator]);
-		$replicator->setCurrentGroup(
-			($this->getForm()->addGroup(
-				$this->prefixPropertyGroup($metadata),
-				FALSE
-			)->add($add))
-		);
-		$this[$metadata->name] = $replicator;
-		if ($createDefault = max(
-			count($collection),
-			$forceDefault
-		)
+		$collection = $this->entity->getValue($metadata->name)->get()->fetchPairs(current($repository->getEntityMetadata()->getPrimaryKey()));
+		$replicator = new Kdyby\Replicator\Container(function (Nette\Forms\Container $container) use
+		(
+			$metadata,
+			$repository,
+			$collection
 		) {
+			$replicator = $container->parent;
+			$name = $container->getName();
+			unset($container->parent[$name]);
+			if ( ! $entity = $collection[$name] ?? NULL) {
+				$entityClassName = $repository->getEntityMetadata()->getClassName();
+				$entity = new $entityClassName;
+			}
+			$replicator->addComponent($container = $this->form->createComponent($entity), $name);
+			if ($container instanceof Nette\Forms\Container) {
+				$container->addSubmit('delete', $this->formatPropertyAction($metadata, 'delete'))->addRemoveOnClick(function (
+					Kdyby\Replicator\Container $replicator,
+					self $container
+				) {
+					$container->removeEntity(TRUE);
+				});
+			}
+		});
+		$add = $replicator->addSubmit('add', $this->formatPropertyAction($metadata, 'add'));
+		call_user_func([
+			$add,
+			'addCreateOnClick',
+		]);
+		$add->setValidationScope([$replicator]);
+		$replicator->setCurrentGroup(($this->getForm()->addGroup($this->prefixPropertyGroup($metadata), FALSE)->add($add)));
+		$this[$metadata->name] = $replicator;
+		if ($createDefault = max(count($collection), $forceDefault)) {
 			if ( ! $this->getForm()->isSubmitted()) {
 				$count = 0;
 				while ($count++ < $createDefault) {
@@ -476,12 +349,9 @@ abstract class Container
 		if ($add->isSubmittedBy()) {
 			$isValid = TRUE;
 			if ($scope = $add->getValidationScope()) {
-				$isValid = ! array_filter(
-					$scope,
-					function (Nette\Forms\Container $container) {
-						return ! $container->isValid();
-					}
-				);
+				$isValid = ! array_filter($scope, function (Nette\Forms\Container $container) {
+					return ! $container->isValid();
+				});
 			}
 			if ($isValid) {
 				$add->setValidationScope(FALSE);
@@ -499,26 +369,17 @@ abstract class Container
 			}
 		}
 		if (count($containers) <= $forceDefault) {
-			array_map(
-				function (self $container) {
-					unset($container['delete']);
-				},
-				$containers
-			);
+			array_map(function (self $container) {
+				unset($container['delete']);
+			}, $containers);
 		} else {
-			$persistedContainers = array_filter(
-				$containers,
-				function (self $container) {
-					return $container->getEntity()->isPersisted();
-				}
-			);
+			$persistedContainers = array_filter($containers, function (self $container) {
+				return $container->getEntity()->isPersisted();
+			});
 			if (count($persistedContainers) <= $forceDefault) {
-				array_map(
-					function (self $container) {
-						unset($container['delete']);
-					},
-					$persistedContainers
-				);
+				array_map(function (self $container) {
+					unset($container['delete']);
+				}, $persistedContainers);
 			}
 		}
 		foreach (
@@ -526,33 +387,19 @@ abstract class Container
 		) {
 			if ($container instanceof Nette\ComponentModel\IContainer) {
 				foreach (
-					$container->getComponents(
-						FALSE,
-						Nette\Forms\Controls\BaseControl::class
-					) as $control
+					$container->getComponents(FALSE, Nette\Forms\Controls\BaseControl::class) as $control
 				) {
 					if ($control instanceof Nette\Forms\Controls\BaseControl && $unique = $control->getOption('unique')) {
 						foreach (
-							array_diff_key(
-								$containers,
-								[$key => $container]
-							) as $sibling
+							array_diff_key($containers, [$key => $container]) as $sibling
 						) {
 							$condition = $control->addCondition(Nette\Forms\Form::FILLED);
 							if (is_string($unique) && isset($sibling[$unique]) && $uniqueControl = $container[$unique] ?? NULL) {
 								if ($uniqueControl instanceof Nette\Forms\IControl) {
-									$condition = $condition->addConditionOn(
-										$uniqueControl,
-										Nette\Forms\Form::EQUAL,
-										$sibling[$unique]
-									);
+									$condition = $condition->addConditionOn($uniqueControl, Nette\Forms\Form::EQUAL, $sibling[$unique]);
 								}
 							}
-							$condition->addRule(
-								Nette\Forms\Form::NOT_EQUAL,
-								NULL,
-								$sibling[$control->name]
-							);
+							$condition->addRule(Nette\Forms\Form::NOT_EQUAL, NULL, $sibling[$control->name]);
 						}
 					}
 				}
@@ -564,13 +411,10 @@ abstract class Container
 
 	protected function prefixPropertyGroup(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata) : string
 	{
-		return implode(
-			'.',
-			[
-				$this->prefixProperty($metadata),
-				'group',
-			]
-		);
+		return implode('.', [
+			$this->prefixProperty($metadata),
+			'group',
+		]);
 	}
 
 	protected function formatPropertyAction(
@@ -578,14 +422,11 @@ abstract class Container
 		string $action
 	) : string
 	{
-		return implode(
-			'.',
-			[
-				$this->prefixProperty($metadata),
-				'action',
-				$action,
-			]
-		);
+		return implode('.', [
+			$this->prefixProperty($metadata),
+			'action',
+			$action,
+		]);
 	}
 
 	protected function createComponentInt(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata) : Nette\Forms\Controls\TextInput
@@ -595,18 +436,12 @@ abstract class Container
 
 	protected function createComponentString(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata) : Nette\Forms\Controls\TextInput
 	{
-		return $this->addText(
-			$metadata->name,
-			$this->formatPropertyLabel($metadata)
-		);
+		return $this->addText($metadata->name, $this->formatPropertyLabel($metadata));
 	}
 
 	protected function createComponentBool(Nextras\Orm\Entity\Reflection\PropertyMetadata $metadata) : Nette\Forms\Controls\Checkbox
 	{
-		return $this->addCheckbox(
-			$metadata->name,
-			$this->formatPropertyLabel($metadata)
-		);
+		return $this->addCheckbox($metadata->name, $this->formatPropertyLabel($metadata));
 	}
 
 	protected function render(
@@ -616,27 +451,17 @@ abstract class Container
 		if ( ! $file) {
 			return NULL;
 		}
-		$presenter = $form->lookup(
-			Nette\Application\UI\Presenter::class,
-			FALSE
-		);
+		$presenter = $form->lookup(Nette\Application\UI\Presenter::class, FALSE);
 		if ($presenter instanceof Nette\Application\UI\Presenter) {
-			$template = $presenter->getTemplateFactory()->createTemplate(
-				$form->lookup(
-					Nette\Application\UI\Control::class,
-					FALSE
-				)
-			);
+			$template = $presenter->getTemplateFactory()->createTemplate($form->lookup(Nette\Application\UI\Control::class, FALSE));
 			if ( ! $template instanceof Nette\Bridges\ApplicationLatte\Template) {
 				return NULL;
 			}
 			$template->setFile($file);
-			$template->setParameters(
-				[
-					'form' => $form,
-					'_form' => $this,
-				]
-			);
+			$template->setParameters([
+				'form' => $form,
+				'_form' => $this,
+			]);
 
 			return (string) $template;
 		}

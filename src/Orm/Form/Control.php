@@ -34,10 +34,7 @@ abstract class Control
 			$presenter = $this->getPresenter();
 			switch ($form->isSubmitted()) {
 				case $form['action']['add']:
-					$presenter->redirect(
-						'Presenter:edit',
-						$this->entity->getPersistedId()
-					);
+					$presenter->redirect('Presenter:edit', $this->entity->getPersistedId());
 					break;
 				case $form['action']['edit']:
 					$presenter->redirect('this#' . $this->getSnippetId());

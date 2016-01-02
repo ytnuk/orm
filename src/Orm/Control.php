@@ -38,20 +38,13 @@ abstract class Control
 
 	protected function createComponentPagination() : Nette\Application\UI\Multiplier
 	{
-		return new Nette\Application\UI\Multiplier(
-			function ($key) : Ytnuk\Orm\Pagination\Control {
-				$control = new Ytnuk\Orm\Pagination\Control(
-					$this->entity->getValue($key),
-					is_array(
-						static::$itemsPerPage
-					) ? (static::$itemsPerPage[$key] ?? self::$itemsPerPage) : static::$itemsPerPage
-				);
-				if ($this->storage) {
-					$control->setCacheStorage($this->storage);
-				}
-
-				return $control;
+		return new Nette\Application\UI\Multiplier(function ($key) : Ytnuk\Orm\Pagination\Control {
+			$control = new Ytnuk\Orm\Pagination\Control($this->entity->getValue($key), is_array(static::$itemsPerPage) ? (static::$itemsPerPage[$key] ?? self::$itemsPerPage) : static::$itemsPerPage);
+			if ($this->storage) {
+				$control->setCacheStorage($this->storage);
 			}
-		);
+
+			return $control;
+		});
 	}
 }

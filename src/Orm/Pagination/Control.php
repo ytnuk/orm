@@ -25,11 +25,7 @@ final class Control
 		int $itemsPerPage = 1,
 		Nette\Utils\Paginator $paginator = NULL
 	) {
-		parent::__construct(
-			$this->collection = $collection,
-			$itemsPerPage,
-			$this->paginator = $paginator ? : new Nette\Utils\Paginator
-		);
+		parent::__construct($this->collection = $collection, $itemsPerPage, $this->paginator = $paginator ? : new Nette\Utils\Paginator);
 	}
 
 	public function count() : int
@@ -39,9 +35,6 @@ final class Control
 
 	public function getIterator() : IteratorAggregate
 	{
-		return $this->collection->limitBy(
-			$this->paginator->getItemsPerPage(),
-			$this->paginator->getOffset()
-		) ? : parent::getIterator();
+		return $this->collection->limitBy($this->paginator->getItemsPerPage(), $this->paginator->getOffset()) ? : parent::getIterator();
 	}
 }

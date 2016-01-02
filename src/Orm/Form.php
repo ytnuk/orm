@@ -52,38 +52,20 @@ final class Form
 	protected function attached($control)
 	{
 		parent::attached($control);
-		$this->addComponent(
-			$this->createComponent($this->entity),
-			'this'
-		);
+		$this->addComponent($this->createComponent($this->entity), 'this');
 		$this->addGroup('orm.form.action.group');
 		$action = $this->addContainer('action');
-		$action->addSubmit(
-			'add',
-			'orm.form.action.add.label'
-		)->setDisabled($this->entity->isPersisted());
-		$action->addSubmit(
-			'edit',
-			'orm.form.action.edit.label'
-		)->setDisabled(! $this->entity->isPersisted());
-		$action->addSubmit(
-			'delete',
-			'orm.form.action.delete.label'
-		)->setValidationScope(FALSE)->setDisabled(! $this->entity->isPersisted());
+		$action->addSubmit('add', 'orm.form.action.add.label')->setDisabled($this->entity->isPersisted());
+		$action->addSubmit('edit', 'orm.form.action.edit.label')->setDisabled(! $this->entity->isPersisted());
+		$action->addSubmit('delete', 'orm.form.action.delete.label')->setValidationScope(FALSE)->setDisabled(! $this->entity->isPersisted());
 	}
 
 	protected function createComponent($name)
 	{
 		if ($name instanceof Nextras\Orm\Entity\IEntity) {
-			$class = rtrim(
-					$name->getMetadata()->getClassName(),
-					'a..zA..Z'
-				) . 'Form\Container';
+			$class = rtrim($name->getMetadata()->getClassName(), 'a..zA..Z') . 'Form\Container';
 
-			return new $class(
-				$name,
-				$this->model->getRepositoryForEntity($name)
-			);
+			return new $class($name, $this->model->getRepositoryForEntity($name));
 		}
 
 		return parent::createComponent($name);
@@ -96,16 +78,10 @@ final class Form
 		];
 		$submitted = $this->isSubmitted();
 		if ($submitted instanceof Nette\ComponentModel\Component && $submitted->getParent() === $this['action']) {
-			array_unshift(
-				$message,
-				'orm'
-			);
+			array_unshift($message, 'orm');
 		}
 
-		return implode(
-			'.',
-			$message
-		);
+		return implode('.', $message);
 	}
 
 	protected function getControl() : Nette\Application\UI\Control
