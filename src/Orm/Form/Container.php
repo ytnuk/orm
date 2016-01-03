@@ -87,7 +87,7 @@ abstract class Container
 		}
 	}
 
-	public function initEntityRelations() : array
+	private function initEntityRelations() : array
 	{
 		foreach (
 			$this->relations as $property => $value
