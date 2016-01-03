@@ -76,6 +76,10 @@ abstract class Container
 
 	public function persistEntity(bool $flush = FALSE)
 	{
+		$containers = iterator_to_array($this->getComponents(TRUE, self::class));
+		array_walk($containers, function (self $container) {
+			$container->initEntityRelations();
+		});
 		$this->setValues($this->getValues());
 		$this->repository->persist($this->entity);
 		if ($flush) {
@@ -89,6 +93,7 @@ abstract class Container
 			$this->relations as $property => $value
 		) {
 			$this->entity->setValue($property, $value);
+			unset($this->relations[$property]);
 		}
 
 		return $this->relations;
@@ -163,6 +168,12 @@ abstract class Container
 			$path = substr($path, 0, $delimiter);
 		}
 		$parent = $this->lookup(self::class, FALSE);
+		if ($path && $parent instanceof self) {
+			$parentProperty = $parent->getMetadata()->getProperty($path);
+			if ($parentProperty->relationship && ! $parentProperty->relationship->property) {
+				$parent->relations[$path] = $this->getEntity();
+			}
+		}
 		foreach (
 			$properties as $metadata
 		) {
