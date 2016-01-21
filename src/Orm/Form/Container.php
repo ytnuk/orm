@@ -7,7 +7,7 @@ use Nextras;
 use Ytnuk;
 
 abstract class Container
-	extends Ytnuk\Form\Container
+	extends Ytnuk\Form\Container //TODO: implements Nette\Forms\IFormRenderer
 {
 
 	/**
@@ -455,15 +455,15 @@ abstract class Container
 		return $this->addCheckbox($metadata->name, $this->formatPropertyLabel($metadata));
 	}
 
-	protected function render(
-		Nette\Forms\Form $form,
-		string $file = NULL
-	) {
-		if ( ! $file) {
-			return NULL;
-		}
+	public function render(Nette\Forms\Form $form)
+	{
 		$presenter = $form->lookup(Nette\Application\UI\Presenter::class, FALSE);
-		if ($presenter instanceof Nette\Application\UI\Presenter) {
+		if ($presenter instanceof Ytnuk\Application\Presenter) {
+			$templating = $presenter->createComponent('templating');
+			$templating->setParent($this);
+			if ( ! iterator_to_array($file = $templating['view'])) {
+				return NULL;
+			}
 			$template = $presenter->getTemplateFactory()->createTemplate($form->lookup(Nette\Application\UI\Control::class, FALSE));
 			if ( ! $template instanceof Nette\Bridges\ApplicationLatte\Template) {
 				return NULL;
