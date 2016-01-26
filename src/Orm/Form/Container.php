@@ -328,7 +328,10 @@ abstract class Container
 			}
 			$replicator->addComponent($container = $this->form->createComponent($entity), $name);
 			if ($container instanceof Nette\Forms\Container) {
-				$container->addSubmit('delete', $this->formatPropertyAction($metadata, 'delete'))->addRemoveOnClick(function (
+				call_user_func([
+					$container->addSubmit('delete', $this->formatPropertyAction($metadata, 'delete')),
+					'addRemoveOnClick',
+				], function (
 					Kdyby\Replicator\Container $replicator,
 					self $container
 				) {
